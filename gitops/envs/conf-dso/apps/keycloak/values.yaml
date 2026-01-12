@@ -1,8 +1,7 @@
 cluster:
   cluster:
     enablePDB: false
-    imageName: docker.io
-      {.repository.ghcr}>/cloudnative-pg/postgresql:16.2
+    imageName: ghcr.io/cloudnative-pg/postgresql:16.2
     initdb:
       database: keycloak
       owner: keycloak
