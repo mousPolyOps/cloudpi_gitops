@@ -76,6 +76,8 @@ keycloak:
     host: pg-cluster-keycloak-rw
     port: 5432
   extraEnvVars:
+  - name: KC_DB
+    value: postgres
   - name: DSFR_THEME_HOME_URL
     value: https://keycloak.polyops.fr
   - name: DSFR_THEME_SERVICE_TITLE
@@ -119,6 +121,21 @@ keycloak:
       pathType: Prefix
     extraRules: []
     hostname: keycloak.polyops.fr
+    extraEnvVars:
+    - name: KC_HOSTNAME
+      value: keycloak.polyops.fr
+    - name: KC_HOSTNAME_STRICT
+      value: "false"
+    - name: KC_HTTP_RELATIVE_PATH
+      value: /
+    - name: KC_PROXY_HEADERS
+      value: xforwarded
+    - name: KC_HTTP_ENABLED
+      value: "true"
+    - name: KC_HEALTH_ENABLED
+      value: "true"
+    - name: KC_METRICS_ENABLED
+      value: "true"
     ingressClassName: traefik
     labels:
       app: keycloak
