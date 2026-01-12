@@ -106,9 +106,10 @@ keycloak:
     value: cloudpinative-relations@interieur.gouv.fr
   extraEnvVarsCM: ''
   extraEnvVarsSecret: ''
-  extraStartupArgs: '--optimized'
+  extraStartupArgs: ''
   fullnameOverride: keycloak
   global:
+    imageRegistry: docker.io
     security:
       allowInsecureImages: true
   httpRelativePath: /
