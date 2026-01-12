@@ -78,6 +78,16 @@ keycloak:
   extraEnvVars:
   - name: KC_DB
     value: postgres
+  - name: KC_HOSTNAME
+    value: keycloak.polyops.fr
+  - name: KC_HOSTNAME_STRICT
+    value: "false"
+  - name: KC_PROXY_HEADERS
+    value: xforwarded
+  - name: KC_HTTP_ENABLED
+    value: "true"
+  - name: KC_BOOTSTRAP_ADMIN_USERNAME
+    value: admin
   - name: DSFR_THEME_HOME_URL
     value: https://keycloak.polyops.fr
   - name: DSFR_THEME_SERVICE_TITLE
@@ -122,6 +132,8 @@ keycloak:
     extraRules: []
     hostname: keycloak.polyops.fr
     extraEnvVars:
+    - name: KC_DB
+      value: postgres
     - name: KC_HOSTNAME
       value: keycloak.polyops.fr
     - name: KC_HOSTNAME_STRICT
