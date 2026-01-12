@@ -188,7 +188,7 @@ keycloak:
     enabled: false
   postgresql:
     enabled: false
-  production: true
+  production: false
   proxyHeaders: xforwarded
   rbac:
     create: false
