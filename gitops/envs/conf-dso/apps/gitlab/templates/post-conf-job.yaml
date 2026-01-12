@@ -1,0 +1,57 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: gitlab-token-access-role
+  namespace: dso-gitlab
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["get", "list", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: gitlab-token-access-role-binding
+  namespace: dso-gitlab
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: gitlab-token-access-role
+subjects:
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: dso-gitlab
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: get-gitlab-role
+  namespace: dso-gitlab
+rules:
+  - apiGroups: [""]
+    resources: ["endpoints"]
+    verbs: ["list", "get"]
+    resourceNames: ["gitlab-webservice-default"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["list", "get"]
+    resourceNames: ["gitlab-runner"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: get-gitlab-role-binding
+  namespace: dso-gitlab
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: get-gitlab-role
+subjects:
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: dso-gitlab

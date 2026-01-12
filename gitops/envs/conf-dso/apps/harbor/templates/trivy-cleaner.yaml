@@ -1,0 +1,60 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: trivy-cleaner-sa
+  namespace: "dso-harbor"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: trivy-cleaner-role
+  namespace: "dso-harbor"
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: trivy-cleaner-rb
+  namespace: "dso-harbor"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: trivy-cleaner-role
+subjects:
+- kind: ServiceAccount
+  name: trivy-cleaner-sa
+  namespace: "dso-harbor"
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: harbor-trivy-clean
+  namespace: "dso-harbor"
+spec:
+  schedule: "0 3 * * 0"  # Every Sunday at 3 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: trivy-cleaner-sa
+          restartPolicy: Never
+          containers:
+          - name: trivy-cleaner
+            image: "registry.k8s.io/kubectl"
+            command:
+              - /bin/sh
+              - -c
+              - |
+                echo "Cleaning Trivy caches in all replicas..."
+                for pod in $(kubectl get pods -n dso-harbor -l component=trivy -o name); do
+                  echo "Running cleanup in $pod ..."
+                  kubectl exec -n dso-harbor $pod -- trivy clean --all
+                done
+                echo "All done."

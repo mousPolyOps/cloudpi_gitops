@@ -1,0 +1,28 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Pooler
+metadata:
+  name: pooler-pg-cluster-gitlab-rw
+  namespace: dso-gitlab
+spec:
+  cluster:
+    name: pg-cluster-gitlab
+  instances: 3
+  type: rw
+  pgbouncer:
+    poolMode: session
+    parameters:
+      max_client_conn: "1000"
+      default_pool_size: "100"
+  template:
+    spec:
+      containers: []
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    cnpg.io/cluster: pg-cluster-gitlab
+                    cnpg.io/podRole: pooler
+                topologyKey: kubernetes.io/hostname

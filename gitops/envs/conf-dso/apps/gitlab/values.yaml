@@ -1,0 +1,110 @@
+cluster:
+  cluster:
+    enablePDB: false
+    imageName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      {.repository.ghcr}>/cloudnative-pg/postgresql:16.2
+    initdb:
+      database: gitlabhq_production
+      owner: gitlab
+    monitoring:
+      enabled: false
+    postgresql:
+      parameters:
+        max_worker_processes: '60'
+      pg_hba:
+      - host gitlabhq_production gitlab all md5
+      - host gitlabhq_production streaming_replica all md5
+    primaryUpdateMethod: restart
+    storage:
+      size: 10Gi
+  fullnameOverride: pg-cluster-gitlab
+  nameOverride: pg-cluster-gitlab
+cpn-ansible-job:
+  cronJob:
+    command:
+    - /bin/sh
+    - -c
+    - 'git clone https://github.com/cloud-pi-native/socle.git && \
+
+      cd socle && \
+
+      ansible-playbook post-install/gitlab-ci-catalog.yaml
+
+      '
+    create: true
+  global:
+    platform: openshift
+  job:
+    activeDeadlineSeconds: 1800
+    backoffLimit: 60
+    command:
+    - /bin/sh
+    - -c
+    - 'git clone https://github.com/cloud-pi-native/socle.git && \
+
+      cd socle && \
+
+      ansible-playbook post-install/gitlab.yaml
+
+      '
+    extraEnvFrom:
+    - secretRef:
+        name: ansible-secret
+    image:
+      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+        {.repository.ghcr}>/cloud-pi-native/git-ansible
+      tag: '1'
+gitlab:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              control-plane: controller-manager
+          topologyKey: kubernetes.io/hostname
+        weight: 100
+  app:
+    serviceAccount:
+      annotations: {}
+      create: true
+  cert-manager:
+    install: false
+  extraEnvs: []
+  fullnameOverride: ''
+  image:
+    name: gitlab-operator
+    prepend: 'false'
+    pullPolicy: IfNotPresent
+    registry: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      {.repository.gitlab}>
+    repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      {.repository.gitlabOperator}>/cloud-native
+    tag: 2.4.1
+  manager:
+    debug:
+      enabled: true
+    kubeRbacProxy:
+      image:
+        registry: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+          {.repository.gitlab}>
+    serviceAccount:
+      annotations: {}
+      create: true
+    webhook:
+      selfSignedCert:
+        create: true
+  nameOverride: conf-dso-gitlab-operator
+  nginx-ingress:
+    serviceAccount:
+      create: false
+  nodeSelector: {}
+  podAnnotations: {}
+  prometheus:
+    serviceAccount:
+      server:
+        annotations: {}
+        create: true
+  scc: {}
+  tolerations: []
+  watchCluster: false

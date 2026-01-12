@@ -6,48 +6,128 @@ metadata:
   name: conf-dso
 spec:
   additionalsCA: []
+  argocd:
+    admin:
+      enabled: false
+    installEnabled: true
+    zoneName: default
+  argocdInfra:
+    admin:
+      enabled: false
+    installEnabled: false
+    namespace: infra-argocd
+    projectName: default
+  awx:
+    installEnabled: true
+    postgresPvcSize: 10Gi
+    values: {}
+  certmanager:
+    forcedInstall: false
+    installEnabled: false
+  cloudnativepg:
+    forcedInstall: false
+    installEnabled: true
+  console:
+    installEnabled: true
+    postgresPvcSize: 10Gi
+  cpnAnsibleJob: {}
+  cpnIntegrationTestJob: {}
+  dashboard:
+    installEnabled: false
   exposedCA:
     type: none
+  gitlab:
+    extraCIVars: []
+    installEnabled: true
+    postgresPvcSize: 10Gi
+  gitlabOperator: {}
+  gitlabrunner:
+    installEnabled: true
+  glexporter:
+    installEnabled: true
   global:
     alerting:
       enabled: false
+    backup:
+      cnpg:
+        compression: none
+        cron: 0 0 */6 * * *
+        enabled: false
+        pathPrefix: cnpg
+        retentionPolicy: 30d
+      gitlab:
+        cron: 0 */6 * * *
+        enabled: false
+        pathPrefix: gitlab
+        retentionPolicy: 30d
+      vault:
+        cron: 0 */6 * * *
+        enabled: false
+        pathPrefix: vault
+        retentionPolicy: 30d
+      vaultInfra:
+        cron: 0 */6 * * *
+        enabled: false
+        pathPrefix: vault-infra
+        retentionPolicy: 30d
     dockerAccount:
       enabled: false
     environment: production
     gitOps:
       deploymentEnabled: false
-      envName: k3s
+      envName: sandbox
       namespacePrefix: dso-
       repo:
         path: gitops
         revision: main
         url: https://github.com/cloud-pi-native/socle.git
-      watchpointEnabled: false
-    infraRootDomain: .infra.polyops.fr
+      watchpointEnabled: true
+    infraRootDomain: .infra.example.com
     installEnabled: true
     logs:
       enabled: false
     metrics:
       enabled: false
     offline: false
-    platform: kubernetes
+    platform: openshift
     projectsRootDir:
     - forge
-    rootDomain: .polyops.fr
-    smtp:
-      enabled: false
+    rootDomain: .example.com
+    smtp: {}
+  grafana: {}
+  harbor:
+    installEnabled: true
+    postgresPvcSize: 10Gi
+    pvcRegistrySize: 50Gi
   ingress:
     annotations:
-      kubernetes.io/ingress.class: traefik
+      route.openshift.io/termination: edge
     labels: {}
     tls:
-      acme:
-        email: mous.bendjema@gmail.com
-        environment: production
-      type: acme
+      type: none
+  keycloak:
+    installEnabled: true
+    postgresPvcSize: 10Gi
+  keycloakInfra:
+    installEnabled: false
+    postgresPvcSize: 10Gi
+  kyverno:
+    forcedInstall: false
+    installEnabled: false
+  nexus:
+    installEnabled: true
+  observatorium:
+    installEnabled: false
   prometheus:
     crd:
       type: external
   proxy:
     enabled: false
     no_proxy: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain
+  sonarqube:
+    installEnabled: true
+    postgresPvcSize: 10Gi
+  vault:
+    installEnabled: true
+  vaultInfra:
+    installEnabled: false

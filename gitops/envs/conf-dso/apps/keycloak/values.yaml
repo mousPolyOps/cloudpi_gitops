@@ -1,0 +1,238 @@
+cluster:
+  cluster:
+    enablePDB: false
+    imageName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      {.repository.ghcr}>/cloudnative-pg/postgresql:16.2
+    initdb:
+      database: keycloak
+      owner: keycloak
+    monitoring:
+      enabled: false
+    postgresql:
+      parameters:
+        max_worker_processes: '60'
+      pg_hba:
+      - host keycloak keycloak all md5
+      - host keycloak streaming_replica all md5
+    primaryUpdateMethod: restart
+    storage:
+      size: 10Gi
+  fullnameOverride: pg-cluster-keycloak
+  nameOverride: pg-cluster-keycloak
+cpn-ansible-job:
+  global:
+    platform: openshift
+  job:
+    command:
+    - /bin/sh
+    - -c
+    - 'git clone https://github.com/cloud-pi-native/socle.git && \
+
+      cd socle && \
+
+      ansible-playbook post-install/keycloak.yaml
+
+      '
+    extraEnvFrom:
+    - secretRef:
+        name: ansible-secret
+    extraVolumeMounts:
+    - mountPath: /config
+      name: users-csv
+      readOnly: true
+    extraVolumes:
+    - configMap:
+        name: keycloak-users
+      name: users-csv
+    image:
+      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+        {.repository.ghcr}>/cloud-pi-native/git-ansible
+      tag: '1'
+keycloak:
+  args: []
+  auth:
+    adminUser: admin
+    existingSecret: keycloak
+    passwordSecretKey: admin-password
+  autoscaling:
+    enabled: false
+  cache:
+    enabled: true
+    stackFile: ''
+    stackName: kubernetes
+  command: []
+  configuration: ''
+  containerPorts:
+    http: 8080
+    https: 8443
+    infinispan: 7800
+  containerSecurityContext:
+    enabled: false
+  existingConfigmap: ''
+  externalDatabase:
+    database: keycloak
+    existingSecret: pg-cluster-keycloak-app
+    existingSecretPasswordKey: password
+    existingSecretUserKey: username
+    host: pg-cluster-keycloak-rw
+    port: 5432
+  extraEnvVars:
+  - name: DSFR_THEME_HOME_URL
+    value: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain |
+      jsonPath {.console}>
+  - name: DSFR_THEME_SERVICE_TITLE
+    value: Cloud Pi Native
+  - name: DSFR_THEME_BRAND_TOP
+    value: Ministere<br/>de l'interieur
+  - name: DSFR_THEME_CONTACT_EMAIL
+    value: cloudpinative-relations@interieur.gouv.fr
+  extraEnvVarsCM: ''
+  extraEnvVarsSecret: ''
+  extraStartupArgs: ''
+  fullnameOverride: keycloak
+  global:
+    security:
+      allowInsecureImages: true
+  httpRelativePath: /
+  image:
+    pullPolicy: IfNotPresent
+    registry: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      {.repository.docker}>
+    repository: bitnamilegacy/keycloak
+  ingress:
+    annotations:
+      route.openshift.io/termination: edge
+    apiVersion: ''
+    enabled: true
+    extraHosts: []
+    extraPaths:
+    - backend:
+        service:
+          name: forbidden
+          port:
+            name: http
+      path: /admin/
+      pathType: Prefix
+    - backend:
+        service:
+          name: forbidden
+          port:
+            name: http
+      path: /realms/master/
+      pathType: Prefix
+    extraRules: []
+    hostname: <path:dso-sandbox/data/env/conf-dso/apps/global/values#domain | jsonPath
+      {.keycloak}>
+    ingressClassName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+    labels:
+      app: keycloak
+    path: /
+    pathType: Prefix
+    secrets: []
+    selfSigned: false
+    servicePort: http
+    tls: true
+  initContainers:
+  - args:
+    - -c
+    - 'mkdir -p /emptydir/app-providers-dir && \
+
+      curl -k -fsSL -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar <path:dso-sandbox/data/env/conf-dso/apps/keycloak/values#initcontainers
+      | jsonPath {.pluginDownloadUrl}> && \
+
+      curl -k -fsSL -o /emptydir/app-providers-dir/keycloak-franceconnect.jar <path:dso-sandbox/data/env/conf-dso/apps/keycloak/values#initcontainers
+      | jsonPath {.providerDownloadUrl}>
+
+      '
+    command:
+    - sh
+    image: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      {.repository.docker}>/curlimages/curl:8.12.1
+    imagePullPolicy: IfNotPresent
+    name: realm-ext-provider
+    volumeMounts:
+    - mountPath: /emptydir
+      name: empty-dir
+  initdbScriptsConfigMap: ''
+  keycloakConfigCli:
+    enabled: false
+  livenessProbe:
+    enabled: true
+    failureThreshold: 3
+    initialDelaySeconds: 300
+    periodSeconds: 1
+    successThreshold: 1
+    timeoutSeconds: 5
+  logging:
+    level: INFO
+    output: default
+  metrics:
+    enabled: false
+    serviceMonitor:
+      enabled: false
+  networkPolicy:
+    additionalRules: {}
+    allowExternal: true
+    enabled: false
+  pdb:
+    create: false
+  podAntiAffinityPreset: soft
+  podSecurityContext:
+    enabled: false
+  postgresql:
+    enabled: false
+  production: true
+  proxyHeaders: xforwarded
+  rbac:
+    create: false
+    rules: []
+  readinessProbe:
+    enabled: true
+    failureThreshold: 3
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  replicaCount: 3
+  resources:
+    limits:
+      memory: 2048Mi
+    requests:
+      memory: 1024Mi
+  service:
+    annotations: null
+    clusterIP: ''
+    externalTrafficPolicy: Cluster
+    extraHeadlessPorts: []
+    extraPorts: []
+    headless:
+      annotations: null
+      extraPorts: []
+    http:
+      enabled: true
+    loadBalancerIP: ''
+    loadBalancerSourceRanges: []
+    nodePorts:
+      http: ''
+      https: ''
+    ports:
+      http: 80
+      https: 443
+    sessionAffinity: None
+    sessionAffinityConfig: null
+    type: ClusterIP
+  serviceAccount:
+    annotations: null
+    automountServiceAccountToken: true
+    create: true
+    extraLabels: null
+    name: ''
+  startupProbe:
+    enabled: false
+    failureThreshold: 60
+    initialDelaySeconds: 30
+    periodSeconds: 5
+    successThreshold: 1
+    timeoutSeconds: 1
+  tls:
+    enabled: false

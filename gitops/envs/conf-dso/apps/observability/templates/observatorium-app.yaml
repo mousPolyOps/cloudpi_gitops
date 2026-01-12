@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "sandbox-dso-observatorium"
+  namespace: infra-argocd
+spec:
+  destination:
+    namespace: dso-observatorium
+    name: {{ .Values.destinationClusterName }}
+  project: default
+  sources:
+  - chart: observatorium
+    repoURL: https://cloud-pi-native.github.io/helm-charts
+    targetRevision: '>=0.0.0 <1.0.0'
+    helm:  
+      values: |
+        {{ .Values.observatorium | toYaml | nindent 8 }}
+      valueFiles:
+      - ./values.yaml
+      - $tenants/helm/values.yaml
+  - ref: tenants
+    repoURL: "https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain | jsonPath {.gitlab}>/observability/observability.git"
+    targetRevision: main
+  syncPolicy:
+    automated:
+      prune: true
+    #  selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true

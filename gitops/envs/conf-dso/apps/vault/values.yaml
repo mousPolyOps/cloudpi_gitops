@@ -1,0 +1,64 @@
+cpn-ansible-job:
+  cronJob:
+    create: true
+  global:
+    platform: openshift
+  job:
+    annotations:
+      argocd.argoproj.io/hook: Sync
+    command:
+    - /bin/sh
+    - -c
+    - 'git clone https://github.com/cloud-pi-native/socle.git && \
+
+      cd socle && \
+
+      ansible-playbook post-install/vault.yaml
+
+      '
+    extraEnvFrom:
+    - secretRef:
+        name: ansible-secret
+    image:
+      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+        {.repository.ghcr}>/cloud-pi-native/git-ansible
+      tag: '1'
+vault:
+  csi:
+    agent:
+      image:
+        repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image |
+          jsonPath {.repository.docker}>/hashicorp/vault
+    image:
+      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+        {.repository.docker}>/hashicorp/vault-csi-provider
+  fullnameOverride: conf-dso-vault
+  global:
+    openshift: true
+  injector:
+    agentImage:
+      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+        {.repository.docker}>/hashicorp/vault
+    image:
+      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+        {.repository.docker}>/hashicorp/vault-k8s
+  server:
+    auditStorage:
+      enable: true
+    dataStorage:
+      enable: true
+      size: 23Gi
+    ha:
+      apiAddr: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain
+        | jsonPath {.vault}>
+      enabled: true
+      raft:
+        enabled: true
+      replicas: 3
+    image:
+      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+        {.repository.docker}>/hashicorp/vault
+    route:
+      enabled: false
+    standalone:
+      enabled: false

@@ -1,0 +1,148 @@
+{
+  "env": "conf-dso",
+  "provider": "self-hosted",
+  "region": "fr-par",
+  "namespacePrefix": "dso-",
+  "destination": {
+    "clusterName": "sandbox"
+  },
+  "targetRevision": "main",
+  "apps": [
+    {
+      "app": "global",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "global",
+      "customNamespacePrefix": "",
+      "syncWave": 10
+    },
+    {
+      "app": "awx",
+      "enabled": true,
+      "clusterName": "in-cluster",
+      "namespace": "awx",
+      "customNamespacePrefix": "",
+      "syncWave": 20
+    },
+    {
+      "app": "certmanager",
+      "enabled": false,
+      "clusterName": "",
+      "namespace": "certmanager",
+      "customNamespacePrefix": "",
+      "syncWave": 10
+    },
+    {
+      "app": "kyverno",
+      "enabled": false,
+      "clusterName": "",
+      "namespace": "kyverno",
+      "customNamespacePrefix": "",
+      "syncWave": 10
+    },
+    {
+      "app": "cloudnativepg",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "cloudnativepg",
+      "customNamespacePrefix": "",
+      "syncWave": 10
+    },
+    {
+      "app": "keycloak",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "keycloak",
+      "customNamespacePrefix": "",
+      "syncWave": 20
+    },
+    {
+      "app": "gitlab",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "gitlab",
+      "customNamespacePrefix": "",
+      "syncWave": 30
+    },
+    {
+      "app": "glexporter",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "gitlab",
+      "customNamespacePrefix": "",
+      "syncWave": 40
+    },
+    {
+      "app": "gitlabrunner",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "gitlab",
+      "customNamespacePrefix": "",
+      "syncWave": 40
+    },
+    {
+      "app": "vault",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "vault",
+      "customNamespacePrefix": "",
+      "syncWave": 40
+    },
+    {
+      "app": "harbor",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "harbor",
+      "customNamespacePrefix": "",
+      "syncWave": 50
+    },
+    {
+      "app": "argocd",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "argocd",
+      "customNamespacePrefix": "",
+      "syncWave": 50
+    },
+    {
+      "app": "sonarqube",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "sonarqube",
+      "customNamespacePrefix": "",
+      "syncWave": 50
+    },
+    {
+      "app": "console",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "console",
+      "customNamespacePrefix": "",
+      "syncWave": 60
+    },
+    {
+      "app": "observability",
+      "enabled": false,
+      "clusterName": "in-cluster",
+      "namespace": "argo",
+      "customNamespacePrefix": "infra-",
+      "syncWave": 60
+    },
+    {
+      "app": "nexus",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "nexus",
+      "customNamespacePrefix": "",
+      "syncWave": 60
+    },
+    {
+      "app": "dashboard",
+      "enabled": false,
+      "clusterName": "",
+      "namespace": "grafana",
+      "customNamespacePrefix": "",
+      "syncWave": 70
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+apiVersion: v2
+dependencies:
+- alias: cluster
+  name: cluster
+  repository: https://cloudnative-pg.io/charts
+  version: 0.3.1
+- alias: console
+  name: cpn-console
+  repository: https://cloud-pi-native.github.io/helm-charts
+  version: '>=2.0.0 <3.0.0'
+name: console
+type: application
+version: 1.0.0

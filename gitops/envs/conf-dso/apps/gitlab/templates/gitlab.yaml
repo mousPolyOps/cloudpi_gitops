@@ -1,0 +1,200 @@
+apiVersion: apps.gitlab.com/v1beta1
+kind: GitLab
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: '5'
+  name: gitlab
+  namespace: dso-gitlab
+spec:
+  chart:
+    values:
+      gitlab:
+        gitaly:
+          image:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitaly
+          persistence:
+            size: 50Gi
+          priorityClassName: gitlab-gitaly
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+            requests:
+              cpu: 1000m
+              memory: 2Gi
+          securityContext:
+            fsGroupChangePolicy: OnRootMismatch
+        gitlab-exporter:
+          image:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-exporter
+        gitlab-shell:
+          image:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-shell
+        kas:
+          enabled: false
+          image:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-kas
+        sidekiq:
+          registry:
+            enabled: false
+        toolbox:
+          backups:
+            cron:
+              enabled: <path:dso-sandbox/data/env/conf-dso/apps/gitlab/values#gitlab
+                | jsonPath {.toolbox.backups.cron.enabled}>
+          image:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-toolbox-ee
+        unicorn:
+          registry:
+            enabled: false
+        webservice:
+          ingress:
+            tls: {}
+          registry:
+            enabled: false
+      global:
+        antiAffinity: soft
+        appConfig:
+          defaultProjectsFeatures:
+            containerRegistry: false
+          ldap:
+            preventSignin: true
+          omniauth:
+            allowSingleSignOn:
+            - openid_connect
+            autoLinkLdapUser: false
+            autoLinkSamlUser: false
+            autoLinkUser:
+            - openid_connect
+            autoSignInWithProvider: openid_connect
+            blockAutoCreatedUsers: false
+            enabled: true
+            providers:
+            - secret: openid-connect
+            syncProfileAttributes:
+            - email
+        certificates:
+          customCAs:
+          - configMap: openshift-service-ca.crt
+          image:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/certificates
+        communityImages:
+          migrations:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-toolbox-ce
+          sidekiq:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-sidekiq-ce
+          toolbox:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-toolbox-ce
+          webservice:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-webservice-ce
+          workhorse:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-workhorse-ce
+        enterpriseImages:
+          geo-logcursor:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-geo-logcursor
+          migrations:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-toolbox-ee
+          sidekiq:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-sidekiq-ee
+          toolbox:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-toolbox-ee
+          webservice:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-webservice-ee
+          workhorse:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-workhorse-ee
+        extraEnv:
+          GITLAB_ROOT_EMAIL: admin@example.com
+        gitlabBase:
+          image:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-base
+        hosts:
+          domain: <path:dso-sandbox/data/env/conf-dso/apps/global/values#rootDomain>
+          gitlab:
+            name: <path:dso-sandbox/data/env/conf-dso/apps/global/values#domain |
+              jsonPath {.gitlab}>
+          kas:
+            name: conf-dso-kas.<path:dso-sandbox/data/env/conf-dso/apps/global/values#rootDomain>
+          minio:
+            name: conf-dso-minio.<path:dso-sandbox/data/env/conf-dso/apps/global/values#rootDomain>
+          registry:
+            name: gitlab-registry.example.com
+        ingress:
+          annotations:
+            route.openshift.io/termination: edge
+          class: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+          configureCertmanager: false
+          labels: null
+          tls:
+            enabled: false
+        kubectl:
+          image:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/kubectl
+        psql:
+          database: gitlabhq_production
+          password:
+            key: password
+            secret: pg-cluster-gitlab-app
+          port: 5432
+          serviceName: pooler-pg-cluster-gitlab-rw
+          username: gitlab
+        registry:
+          enabled: false
+      installCertmanager: true
+      minio:
+        image: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+          {.repository.minio}>/minio
+        ingress:
+          tls: {}
+        minioMc:
+          image: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+            {.repository.minio}>/mc
+      nginx-ingress:
+        enabled: false
+      postgresql:
+        image:
+          registry: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image |
+            jsonPath {.repository.gitlab}>
+        install: false
+        metrics:
+          image:
+            registry: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>
+      prometheus:
+        install: false
+      redis:
+        image:
+          registry: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image |
+            jsonPath {.repository.docker}>
+        master:
+          podAntiAffinityPreset: soft
+        metrics:
+          image:
+            registry: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.docker}>
+      registry:
+        enabled: false
+      shared-secrets:
+        selfsign:
+          image:
+            repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+              | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/cfssl-self-sign
+    version: 9.4.1

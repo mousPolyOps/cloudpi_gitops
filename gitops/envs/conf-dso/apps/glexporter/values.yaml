@@ -1,0 +1,43 @@
+glexporter:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: prometheus-exporter
+              app.kubernetes.io/instance: sandbox-dso-glexporter
+              app.kubernetes.io/name: gitlab-ci-pipelines-exporter
+          topologyKey: kubernetes.io/hostname
+        weight: 100
+  config:
+    gitlab:
+      token: <path:dso-sandbox/data/env/conf-dso/apps/gitlab/values#gitlabToken>
+      url: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain |
+        jsonPath {.gitlab}>/
+    redis:
+      url: redis://glexporter-redis-master.dso-gitlab.svc:6379
+    wildcards:
+    - {}
+  fullnameOverride: glexporter
+  image:
+    repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      {.repository.quay}>/mvisonneau/gitlab-ci-pipelines-exporter
+  redis:
+    fullnameOverride: glexporter-redis
+    global:
+      compatibility:
+        openshift:
+          adaptSecurityContext: force
+      imageRegistry: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
+        | jsonPath {.repository.docker}>
+    image:
+      repository: bitnamilegacy/redis
+    master:
+      podAntiAffinityPreset: soft
+  serviceMonitor:
+    enabled: true
+    endpoints:
+    - interval: 30s
+      path: /metrics
+      port: http

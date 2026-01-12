@@ -1,0 +1,20 @@
+cloudnativepg:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/instance: cloudnative-pg
+              app.kubernetes.io/name: cloudnative-pg
+          topologyKey: kubernetes.io/hostname
+        weight: 100
+  containerSecurityContext:
+    runAsGroup: 1000957777
+    runAsUser: 1000957777
+  fullnameOverride: cloudnative-pg
+  image:
+    registry: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      {.repository.ghcr}>/cloudnative-pg/cloudnative-pg
+  nameOverride: cloudnative-pg
+  replicaCount: 3

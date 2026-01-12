@@ -1,0 +1,10 @@
+apiVersion: v2
+dependencies:
+- alias: cloudnativepg
+  name: cloudnative-pg
+  repository: https://cloudnative-pg.io/charts
+  version: 0.27.0
+description: Cloudnative-pg operator installer
+name: cloudnative-pg
+type: application
+version: 0.27.0

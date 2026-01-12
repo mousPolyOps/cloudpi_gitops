@@ -1,0 +1,142 @@
+argocd:
+  applicationSet:
+    enabled: false
+    replicas: 2
+    webhook:
+      ingress:
+        ingressClassName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+  configs:
+# BEGIN ANSIBLE MANAGED BLOCK: rbac
+    rbac:
+      scopes: "[groups]"
+      policy.default: role:nada
+      admin.enabled: "false"
+      policy.csv: |
+        p, role:admin, *, *, */*, allow
+        p, role:nada, applicationsets, *, */*, deny
+        p, role:nada, applications, *, */*, deny
+        p, role:nada, logs, get, */*, allow
+        p, role:nada, exec, *, */*, deny
+        p, role:nada, certificates, *, *, deny
+        p, role:nada, accounts, *, *, deny
+        p, role:nada, gpgkeys, *, *, deny
+        p, role:nada, projects, *, *, deny
+        p, role:nada, clusters, *, *, deny
+        p, role:nada, repositories, get, *, allow
+        g, system:cluster-admins, role:admin
+        g, cluster-admins, role:admin
+        g, /admin, role:admin
+        g, admin, role:admin
+# END ANSIBLE MANAGED BLOCK: rbac
+    cm:
+# BEGIN ANSIBLE MANAGED BLOCK: resource.exclusions, oidc.config and resource.customizations
+      resource.exclusions: |
+        - apiGroups:
+          - tekton.dev
+          clusters:
+          - '*'
+          kinds:
+          - TaskRun
+          - PipelineRun
+        - apiGroups:
+          - wgpolicyk8s.io
+          - aquasecurity.github.io
+          clusters:
+          - '*'
+          kinds:
+          - '*'
+        - apiGroups:
+          - postgresql.cnpg.io
+          clusters:
+          - '*'
+          kinds:
+          - Backup
+        - apiGroups:
+          - reports.kyverno.io
+          clusters:
+          - '*'
+          kinds:
+          - EphemeralReport
+        - apiGroups:
+          - reports.kyverno.io/v1
+          clusters:
+          - '*'
+          kinds:
+          - EphemeralReport
+      resource.customizations.health.grafana.integreatly.org_GrafanaDashboard: |
+        hs = {}
+        hs.status = "Progressing"
+        hs.message = ""
+        if obj.status ~= nil then
+          hs.status = "Healthy"
+          hs.message = "Assumed healthy"
+        end
+        return hs
+      # We need this to be last so rootCA_block will be a sublevel of oidc.config
+      oidc.config: |
+        issuer: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain | jsonPath {.keycloak}>/realms/dso
+        requestedScopes: ["openid", "generic"]
+        name: Keycloak
+        clientID: <path:dso-sandbox/data/env/conf-dso/apps/keycloak/values#client | jsonPath {.argo.id}>
+        clientSecret: <path:dso-sandbox/data/env/conf-dso/apps/keycloak/values#client | jsonPath {.argo.secret}>
+# END ANSIBLE MANAGED BLOCK: resource.exclusions, oidc.config and resource.customizations
+      admin.enabled: 'false'
+      clusterResources: 'true'
+      kustomize.buildOptions: --enable-helm
+      url: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain |
+        jsonPath {.argocd}>
+      users.anonymous.enabled: 'false'
+    params:
+      server.insecure: true
+  controller:
+# BEGIN ANSIBLE MANAGED BLOCK: controller_metrics
+    metrics:
+      enabled: false
+      serviceMonitor:
+        enabled: false
+        namespace: dso-argocd
+# END ANSIBLE MANAGED BLOCK: controller_metrics
+    replicas: 3
+  crds:
+    install: true
+    keep: true
+  dex:
+    enabled: false
+  fullnameOverride: conf-dso-argocd
+  global:
+    affinity:
+      podAntiAffinity: soft
+  image:
+    repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      {.repository.quay}>
+  notifications:
+    enabled: false
+    webhook:
+      ingress:
+        ingressClassName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+  openshift:
+    enabled: true
+  redis:
+    image:
+      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+        {.repository.docker}>
+  redis-ha:
+    enabled: true
+    fullnameOverride: conf-dso-redis-ha
+    global:
+      compatibility:
+        openshift:
+          adaptSecurityContext: auto
+    image:
+      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+        {.repository.docker}>/library/redis
+      tag: 7.4.1-alpine
+  repoServer:
+    initContainers: null
+    replicas: 3
+  server:
+    ingress:
+      ingressClassName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+    ingressGrpc:
+      ingressClassName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+    replicas: 3

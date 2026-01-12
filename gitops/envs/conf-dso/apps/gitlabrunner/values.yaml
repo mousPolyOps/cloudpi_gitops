@@ -1,0 +1,71 @@
+gitlabrunner:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app: gitlab-runner
+              release: sandbox-dso-gitlabrunner
+          topologyKey: kubernetes.io/hostname
+        weight: 100
+  fullnameOverride: gitlab-runner
+  gitlabUrl: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain
+    | jsonPath {.gitlab}>/
+  image:
+    registry: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      {.repository.gitlab}>
+  rbac:
+    create: true
+    podSecurityPolicy:
+      enabled: true
+    rules:
+    - resources:
+      - configmaps
+      - events
+      - pods
+      - pods/attach
+      - pods/exec
+      - secrets
+      - services
+      verbs:
+      - get
+      - list
+      - watch
+      - create
+      - patch
+      - update
+      - delete
+    - apiGroups:
+      - ''
+      resources:
+      - pods/exec
+      verbs:
+      - create
+      - patch
+      - delete
+  replicas: 1
+  resources:
+    limits:
+      ephemeral-storage: 2Gi
+    requests:
+      ephemeral-storage: 500Mi
+  revisionHistoryLimit: 2
+  runnerToken: <path:dso-sandbox/data/env/conf-dso/apps/gitlab/values#runnerToken>
+  runners:
+    config: "[[runners]]\n  [runners.kubernetes]\n    namespace = \"dso-gitlab\"\n
+      \   image = \"ubuntu:22.04\"\n    # multiple \"always\" to retry pull on fail
+      (see. https://docs.gitlab.com/runner/executors/kubernetes.html#set-a-pull-policy)\n
+      \   pull_policy = [\"always\", \"always\"]\n"
+    name: gitlab-runner
+    secret: gitlab-runner-secret
+  serviceAccount:
+    create: true
+    name: gitlab-runner
+  volumeMounts:
+  - mountPath: /.gitlab-runner
+    name: root-gitlab-runner
+  volumes:
+  - emptyDir:
+      medium: Memory
+    name: root-gitlab-runner

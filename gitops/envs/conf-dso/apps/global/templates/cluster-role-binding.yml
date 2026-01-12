@@ -1,0 +1,28 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: conf-dso-dsc-access-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dsc-access-role
+subjects:
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: dso-keycloak
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: dso-gitlab
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: dso-vault
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: dso-harbor
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: dso-sonarqube
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: dso-awx

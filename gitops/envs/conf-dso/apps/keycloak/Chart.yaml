@@ -1,0 +1,17 @@
+apiVersion: v2
+dependencies:
+- alias: cluster
+  name: cluster
+  repository: https://cloudnative-pg.io/charts
+  version: 0.3.1
+- alias: keycloak
+  name: keycloak
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 24.4.11
+- alias: cpn-ansible-job
+  name: cpn-job
+  repository: https://cloud-pi-native.github.io/helm-charts
+  version: '>=1.0.0 <2.0.0'
+name: keycloak
+type: application
+version: 24.4.11

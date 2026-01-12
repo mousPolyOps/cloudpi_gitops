@@ -1,0 +1,119 @@
+nexus:
+  replicaCount: 1
+nexus3:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: repository
+              app.kubernetes.io/instance: sandbox-dso-nexus
+              app.kubernetes.io/name: nexus3
+          topologyKey: kubernetes.io/hostname
+        weight: 100
+  chownDataDir: false
+  config:
+    anonymous:
+      enabled: true
+      roles:
+      - new-anon
+    blobStores:
+    - name: dso
+      path: /nexus-data-docker/dso
+      softQuota:
+        limit: 1073741824
+        type: spaceRemainingQuota
+      type: file
+    cleanup:
+    - criteria:
+        lastDownloaded: '1209600'
+      format: docker
+      mode: delete
+      name: DSOdockerCleanupPolicy
+      notes: ''
+    enabled: true
+    job:
+      annotations:
+        argocd.argoproj.io/hook: PostSync
+        argocd.argoproj.io/hook-delete-policy: HookSucceeded
+      image:
+        pullPolicy: IfNotPresent
+        repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image |
+          jsonPath {.repository.docker}>/alpine/k8s
+        tag: 1.31.2
+      podSecurityContext: false
+      securityContext: false
+      ttlSecondsAfterFinished: ''
+    realms:
+      enabled: true
+      values:
+      - NexusAuthenticatingRealm
+      - DockerToken
+    repos: null
+    roles:
+    - description: new-anon
+      id: new-anon
+      name: new-anon
+      privileges:
+      - nx-repository-view-docker-*-browse
+      - nx-repository-view-docker-*-read
+      roles: []
+    tasks:
+    - attributes:
+        deployOffset: '24'
+        repositoryName: dso-dockerhub-proxy
+      crontab: 0 30 0 * * ?
+      name: Clean Docker unused stuff
+      typeId: repository.docker.gc
+    - attributes:
+        age: '24'
+      crontab: 0 20 0 * * ?
+      name: Clean Docker uploads
+      typeId: repository.docker.upload-purge
+    - attributes:
+        blobstoreName: dso
+      crontab: 0 10 1 * * ?
+      name: Compact DSO Blob Store
+      typeId: blobstore.compact
+    users:
+    - emailAddress: anonymous@example.org
+      firstName: Anonymous
+      lastName: User
+      readOnly: true
+      roles:
+      - new-anon
+      source: default
+      status: active
+      userId: anonymous
+  extraVolumeMounts:
+  - mountPath: /nexus-data-docker
+    name: nexus-data-proxy-cache
+  extraVolumes:
+  - name: nexus-data-proxy-cache
+    persistentVolumeClaim:
+      claimName: nexus-data-proxy-cache
+  fullnameOverride: nexus
+  initNonRootSecurityContext: false
+  initRootSecurityContext: false
+  persistence:
+    accessMode: ReadWriteOnce
+    annotations: {}
+    enabled: true
+    retainDeleted: true
+    retainScaled: true
+    size: 25Gi
+  podSecurityContext: false
+  rootPassword:
+    key: password
+    secret: admin-creds
+  securityContext: false
+  service:
+    additionalPorts:
+    - containerPort: 5000
+      hosts:
+      - <path:dso-sandbox/data/env/conf-dso/apps/global/values#domain | jsonPath {.nexusDockerProxy}>
+      name: dockerproxy
+      port: 5000
+    port: 8081
+    type: ClusterIP

@@ -1,0 +1,17 @@
+apiVersion: v2
+dependencies:
+- alias: cluster
+  name: cluster
+  repository: https://cloudnative-pg.io/charts
+  version: 0.3.1
+- alias: harbor
+  name: harbor
+  repository: https://helm.goharbor.io
+  version: 1.16.0
+- alias: cpn-ansible-job
+  name: cpn-job
+  repository: https://cloud-pi-native.github.io/helm-charts
+  version: '>=1.0.0 <2.0.0'
+name: harbor
+type: application
+version: 1.16.0

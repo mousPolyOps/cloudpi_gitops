@@ -1,0 +1,23 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nexus-alternative
+  namespace: dso-nexus
+  annotations:
+    route.openshift.io/termination: edge
+  labels:
+    app: nexus
+spec:
+  ingressClassName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+  rules:
+    - host: <path:dso-sandbox/data/env/conf-dso/apps/global/values#domain | jsonPath {.nexus}>
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nexus
+                port:
+                  name: http
