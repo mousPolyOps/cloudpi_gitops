@@ -1,0 +1,53 @@
+apiVersion: cloud-pi-native.fr/v1alpha
+kind: DsoSocleConfig
+metadata:
+  annotations:
+    socleVersion: 4.4.2
+  name: conf-dso
+spec:
+  additionalsCA: []
+  exposedCA:
+    type: none
+  global:
+    alerting:
+      enabled: false
+    dockerAccount:
+      enabled: false
+    environment: production
+    gitOps:
+      deploymentEnabled: false
+      envName: k3s
+      namespacePrefix: dso-
+      repo:
+        path: gitops
+        revision: main
+        url: https://github.com/cloud-pi-native/socle.git
+      watchpointEnabled: false
+    infraRootDomain: .infra.polyops.fr
+    installEnabled: true
+    logs:
+      enabled: false
+    metrics:
+      enabled: false
+    offline: false
+    platform: kubernetes
+    projectsRootDir:
+    - forge
+    rootDomain: .polyops.fr
+    smtp:
+      enabled: false
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: traefik
+    labels: {}
+    tls:
+      acme:
+        email: mous.bendjema@gmail.com
+        environment: production
+      type: acme
+  prometheus:
+    crd:
+      type: external
+  proxy:
+    enabled: false
+    no_proxy: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain

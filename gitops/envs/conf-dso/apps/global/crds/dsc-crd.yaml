@@ -1,0 +1,1729 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: dso-socle-configs.cloud-pi-native.fr
+  annotations:
+    socleVersion: 4.4.2
+spec:
+  conversion:
+    strategy: None
+  group: cloud-pi-native.fr
+  names:
+    kind: DsoSocleConfig
+    listKind: DsoSocleConfigList
+    plural: dso-socle-configs
+    shortNames:
+      - dsc
+    singular: dso-socle-config
+  scope: Cluster
+  versions:
+    - name: v1alpha
+      schema:
+        openAPIV3Schema:
+          properties:
+            spec:
+              properties:
+                additionalsCA:
+                  description: Additional CAs to inject into tools; the resources should be available in all namespaces.
+                  items:
+                    properties:
+                      key:
+                        description: Optional CA Resource key. If not set, all keys will be imported.
+                        type: string
+                      kind:
+                        default: ConfigMap
+                        description: CA Resource kind. Only ConfigMap and Secret are supported.
+                        enum:
+                          - ConfigMap
+                          - Secret
+                        type: string
+                      name:
+                        default: kube-root-ca.crt
+                        description: CA Resource name.
+                        type: string
+                      namespace:
+                        default: dso-global
+                        description: CA Resource namespace.
+                        type: string
+                    required:
+                      - kind
+                      - name
+                      - namespace
+                    type: object
+                  type: array
+                exposedCA:
+                  description: Private CA cert needed to validate HTTPS traffic between tools.
+                  type: object
+                  required:
+                    - type
+                  properties:
+                    configmap:
+                      description: The configmap with private CA.
+                      type: object
+                      properties:
+                        namespace:
+                          description: The configmap namespace.
+                          type: string
+                        name:
+                          description: The configmap name.
+                          type: string
+                        key:
+                          description: The configmap key providing the Private CA cert.
+                          type: string
+                      required:
+                        - namespace
+                        - name
+                        - key
+                    secret:
+                      description: The secret with private CA.
+                      type: object
+                      properties:
+                        namespace:
+                          description: The secret namespace.
+                          type: string
+                        name:
+                          description: The secret name.
+                          type: string
+                        key:
+                          description: The secret key providing the Private CA cert.
+                          type: string
+                      required:
+                        - namespace
+                        - name
+                        - key
+                    url:
+                      description: URL providing the plain text private CA cert.
+                      type: string
+                    type:
+                      description: |
+                        Method to find the private CA cert:
+                        - none: No private CA cert needed
+                        - configmap: Private CA cert is stored as a configmap
+                        - secret: Private CA cert is stored as a secret
+                        - url: Private CA cert comes from an external URL
+                        - certmanager: Private CA cert is managed by cert-manager, please use
+                          ingress.tls.ca accordingly
+                      type: string
+                      enum:
+                        - none
+                        - configmap
+                        - secret
+                        - url
+                        - certmanager
+                      default: none
+                argocd:
+                  description: Configuration for Argo CD.
+                  properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Argo CD instance.
+                      type: boolean
+                    admin:
+                      description: Configuration for the Argo CD admin user.
+                      properties:
+                        # TO DO
+                        enabled:
+                          default: false
+                          description: Specifies whether the Argo CD admin user is enabled.
+                          type: boolean
+                      required:
+                        - enabled
+                      type: object
+                    namespace:
+                      description: The namespace for Argo CD.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Argo CD.
+                      type: string
+                    domain:
+                      description: The domain for Argo CD.
+                      type: string
+                    helmRepoUrl:
+                      description: Argo CD helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Argo CD helm chart version (e.g., "4.7.13").
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for Argo CD, they will be merged with roles/argocd/templates/values/
+                        https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
+                        https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    privateGitlabDomain:
+                      description: Private Gitlab repository for Argo CD to access.
+                      type: string
+                    zoneName:
+                      description: Name of the zone (multiple clusters) managed by this Argo CD instance.
+                      type: string
+                    zoneChartVersion:
+                      description: Version of the Helm Chart to use to manage zone objects. See https://github.com/cloud-pi-native/helm-charts/tree/main/charts/dso-argocd-zone
+                      type: string
+                  required:
+                    - admin
+                    - installEnabled
+                  type: object
+                awx:
+                  description: Configuration for AWX.
+                  properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install AWX instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for AWX.
+                      type: string
+                    subDomain:
+                      description: The subdomain for AWX.
+                      type: string
+                    domain:
+                      description: The domain for AWX.
+                      type: string
+                    chartVersion:
+                      description: AWX Operator helm chart version (e.g., "2.19.1").
+                      type: string
+                    defaultAwxVersion:
+                      description: |
+                        AWX default version related to chartVersion is required only
+                        when use_private_registry is true (e.g., "24.6.1").
+                      type: string
+                    values:
+                      description: |
+                        You can merge customs values for awx, it will be merged with roles/awx/tasks/main.yaml
+                        See https://artifacthub.io/packages/helm/awx-operator/awx-operator
+                      type: object
+                      default: {}
+                      x-kubernetes-preserve-unknown-fields: true
+                    postgresPvcSize:
+                      description: Size for postgres' pvc
+                      type: string
+                      default: 10Gi
+                    helmRepoUrl:
+                      description: AWX repository url.
+                      type: string
+                    cnpg:
+                      description: Configuration for cnpg clusters.
+                      type: object
+                      properties:
+                        mode:
+                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          default: primary
+                          type: string
+                          enum:
+                            - primary
+                            - replica
+                            - restore
+                        exposed:
+                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          type: boolean
+                          default: false
+                        nodePort:
+                          description: NodePort used to expose the cnpg cluster instance.
+                          type: string
+                        connectionParameters:
+                          description: Connection parameters used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
+                          type: string
+                  required:
+                    - installEnabled
+                  type: object
+                argocdInfra:
+                  description: Configuration for Argo CD infrastructure instance that will be used to deploy everything else.
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install Argo CD infrastructure instance.
+                      type: boolean
+                    admin:
+                      description: Configuration for the Argo CD infrastructure instance admin user.
+                      properties:
+                        enabled:
+                          description: Specifies whether the Argo CD infrastructure instance admin user is enabled.
+                          type: boolean
+                      required:
+                        - enabled
+                      type: object
+                    namespace:
+                      description: The namespace for Argo CD infrastructure instance.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Argo CD infrastructure instance.
+                      type: string
+                    domain:
+                      description: The domain for Argo CD infrastructure instance.
+                      type: string
+                    helmRepoUrl:
+                      description: Argo CD community maintained helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Argo CD community maintained helm chart version (e.g., "7.3.11").
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for Argo CD infrastructure instance, they will be merged with roles/infra/argocd-infra/templates/values/
+                        https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
+                        https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    privateGitlabDomain:
+                      description: Private Gitlab repository for Argo CD to access.
+                      type: string
+                    vaultPluginVersion:
+                      description: |
+                        Argo CD Vault plugin version (e.g., "1.18.1").
+                        See https://github.com/argoproj-labs/argocd-vault-plugin/releases
+                      type: string
+                    projectName:
+                      type: string
+                      description: AppProject name to use when creating Applications
+                      default: default
+                  required:
+                    - admin
+                    - installEnabled
+                  type: object
+                certmanager:
+                  description: Configuration for Cert Manager.
+                  properties:
+                    namespace:
+                      description: The namespace for Cert-manager.
+                      type: string
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install Cert-manager instance.
+                      type: boolean
+                    helmRepoUrl:
+                      description: Cert-manager helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Cert-manager helm chart version (e.g., "v1.13.1").
+                      type: string
+                    forcedInstall:
+                      description: |
+                        If set to true, cert-manager will be installed (or reinstalled) in the
+                        desired namespace regardless of its existing state.
+                        The default value is false, which means no forced installation will occur.
+                      default: false
+                      type: boolean
+                    values:
+                      description: |
+                        You can add custom values for cert-manager, they will be merged with roles/cert-manager/templates/values/
+                        https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg
+                        https://github.com/cert-manager/cert-manager/blob/master/deploy/charts/cert-manager/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
+                  type: object
+                cloudnativepg:
+                  description: Configuration for CloudNativePG.
+                  type: object
+                  required:
+                    - installEnabled
+                  properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install CloudNativePG Operator instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for CloudNativePG Operator.
+                      type: string
+                    forcedInstall:
+                      description: |
+                        If set to true, CNPG Operator will be installed (or reinstalled) in the
+                        desired namespace regardless of its existing state.
+                        The default value is false, which means no forced installation will occur.
+                      default: false
+                      type: boolean
+                    cluster:
+                      description: Configuration for the cluster.
+                      type: object
+                      properties:
+                        helmRepoUrl:
+                          description: CloudNativePG helm repository url.
+                          type: string
+                        chartVersion:
+                          description: CloudNativePG helm chart version (e.g., "0.3.1").
+                          type: string
+                    operator:
+                      description: Configuration for the operator.
+                      type: object
+                      properties:
+                        helmRepoUrl:
+                          description: CloudNativePG helm repository url.
+                          type: string
+                        chartVersion:
+                          description: CloudNativePG helm chart version (e.g., "0.25.0").
+                          type: string
+                        values:
+                          description: |
+                            You can add custom values for CloudNativePG, they will be merged with roles/gitops/rendering-apps-files/
+                            https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg
+                            https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/values.yaml
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
+                console:
+                  description: Configuration for the console.
+                  properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Console instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for console.
+                      type: string
+                    release:
+                      description: Console release version (e.g., "9.4.0").
+                      type: string
+                    chartVersion:
+                      description: Console helm chart version (e.g., "2.1.11").
+                      type: string
+                    subDomain:
+                      description: The subdomain for console.
+                      type: string
+                    domain:
+                      description: The domain for console.
+                      type: string
+                    helmRepoUrl:
+                      description: Console helm repository url.
+                      type: string
+                    values:
+                      description: Extra helm values for console.
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    postgresPvcSize:
+                      description: Size for postgres data pvc.
+                      type: string
+                      default: 10Gi
+                    postgresWalMaxSlotKeepSize:
+                      description: |
+                        Maximum size of WAL files that replication slots are allowed to retain in
+                        the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount
+                        of WAL files. You can for instance set it to "9GB".
+                        https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Refer to postgresql.conf for memory units.
+                      type: string
+                    postgresWalPvcSize:
+                      description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
+                      type: string
+                    cnpg:
+                      description: Configuration for cnpg clusters.
+                      type: object
+                      properties:
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
+                  required:
+                    - installEnabled
+                  type: object
+                cpnAnsibleJob:
+                  description: Configuration for cpn-ansible-job.
+                  properties:
+                    helmRepoUrl:
+                      description: Cloud-Pi-Native helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Cloud-Pi-Native helm chart version (e.g., "1.0.0").
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for cpn-ansible-job, they will be merged with roles/gitops/rendering-apps-files/
+                        https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-ansible-job
+                        https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-ansible-job/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  type: object
+                cpnIntegrationTestJob:
+                  description: Configuration for cpn-job.
+                  properties:
+                    helmRepoUrl:
+                      description: Cloud-Pi-Native helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Cloud-Pi-Native helm chart version (e.g., "1.0.0").
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for cpn-job, they will be merged with roles/gitops/rendering-apps-files/
+                        https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-job
+                        https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-job/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  type: object
+                dashboard:
+                  description: Configuration for Socle dashboards.
+                  required:
+                    - installEnabled
+                  type: object
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: |
+                        Specifies whether we should install Socle dashboards.
+                        This is disabled by default since the Loki and Mimir code is not yet opensource.
+                      type: boolean
+                gitlab:
+                  description: Configuration for GitLab.
+                  properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Gitlab instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for GitLab.
+                      type: string
+                    subDomain:
+                      description: The subdomain for GitLab.
+                      type: string
+                    domain:
+                      description: The domain for GitLab.
+                      type: string
+                    chartVersion:
+                      description: GitLab chart version (e.g., "6.11.10").
+                      type: string
+                    pvcGitalySize:
+                      description: Size for Gitaly persistent volume.
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for gitlab, they will be merged with roles/gitlab/templates/values/
+                        https://docs.gitlab.com/charts/charts/globals.html
+                        https://gitlab.com/gitlab-org/charts/gitlab/-/blob/master/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    insecureCI:
+                      description: |
+                        If you use a private CA in exposed_ca, you should set it to true.
+                        Configuring tools in pipelines container is not an easy job.
+                      type: boolean
+                    extraCIVars:
+                      description: |
+                        A key value object to inject additional variables into gitlab root group for
+                        CI/CD pipelines.
+                      type: array
+                      default: []
+                      items:
+                        properties:
+                          name:
+                            description: Variable name of the Gitlab CI var.
+                            type: string
+                          value:
+                            description: Value of the Gitlab CI var.
+                            type: string
+                          masked:
+                            description: Should the Gitlab CI var be masked in logs.
+                            type: boolean
+                            default: true
+                          protected:
+                            description: Should the Gitlab CI var be protected.
+                            type: boolean
+                            default: false
+                        type: object
+                        required:
+                          - name
+                          - value
+                    postgresPvcSize:
+                      description: Size for postgres data pvc.
+                      type: string
+                      default: 10Gi
+                    postgresWalMaxSlotKeepSize:
+                      description: |
+                        Maximum size of WAL files that replication slots are allowed to retain in
+                        the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount
+                        of WAL files. You can for instance set it to "9GB".
+                        https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Refer to postgresql.conf for memory units.
+                      type: string
+                    postgresWalPvcSize:
+                      description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
+                      type: string
+                    cnpg:
+                      description: Configuration for cnpg clusters.
+                      type: object
+                      properties:
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
+                  required:
+                    - installEnabled
+                  type: object
+                glexporter:
+                  description: Configuration for GitLab CI Pipelines Exporter.
+                  properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Gitlab-ci pipelines exporter instance.
+                      type: boolean
+                    helmRepoUrl:
+                      description: GitLab CI Pipelines Exporter helm repository url.
+                      type: string
+                    chartVersion:
+                      description: GitLab CI Pipelines Exporter chart version (e.g., "0.3.4").
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for gitLab-ci-pipelines-exporter, they will be
+                        merged with roles/gitlab-ci-pipelines-exporter/templates/values/
+                        https://github.com/mvisonneau/helm-charts/blob/main/charts/gitlab-ci-pipelines-exporter
+                        https://github.com/mvisonneau/helm-charts/blob/main/charts/gitlab-ci-pipelines-exporter/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
+                  type: object
+                gitlabOperator:
+                  description: Configuration for GitLab Operator.
+                  properties:
+                    helmRepoUrl:
+                      description: GitLab Operator helm repository url.
+                      type: string
+                    chartVersion:
+                      description: GitLab Operator release version (e.g., "0.24.1").
+                      type: string
+                    resources:
+                      description: Resources for GitLab Operator.
+                      type: object
+                      properties:
+                        requests:
+                          description: Resources requests for GitLab Operator.
+                          type: object
+                          properties:
+                            cpu:
+                              description: CPU request for GitLab Operator. Unit is m (e.g. 200m).
+                              type: string
+                            memory:
+                              description: Memory request for GitLab Operator. Unit is Mi (e.g. 100Mi).
+                              type: string
+                        limits:
+                          description: Resources limits for GitLab Operator.
+                          type: object
+                          properties:
+                            cpu:
+                              description: CPU limit for GitLab Operator. Unit is m (e.g. 200m).
+                              type: string
+                            memory:
+                              description: Memory limit for GitLab Operator. Unit is Mi (e.g. 300Mi).
+                              type: string
+                    values:
+                      description: |
+                        You can add custom values for GitLab Operator, they will be merged with roles/gitlab-operator/templates/values/
+                        https://docs.gitlab.com/operator/
+                        https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/blob/master/deploy/chart/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  type: object
+                gitlabCatalog:
+                  description: Configuration for GitLab Catalog.
+                  properties:
+                    catalogRepoUrl:
+                      description: GitLab Catalog repository url.
+                      default: https://github.com/cloud-pi-native/gitlab-ci-catalog.git
+                      type: string
+                  type: object
+                gitlabrunner:
+                  description: Configuration for GitLab Runner.
+                  properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Gitlab-runner instance.
+                      type: boolean
+                    helmRepoUrl:
+                      description: GitLab Runner helm repository url.
+                      type: string
+                    chartVersion:
+                      description: GitLab Runner chart version (e.g., "0.57.0").
+                      type: string
+                    resources:
+                      description: Resources for GitLab Runner.
+                      type: object
+                      properties:
+                        requests:
+                          description: Resources requests for GitLab Runner.
+                          type: object
+                          properties:
+                            cpu:
+                              description: CPU request for GitLab Runner.
+                              type: string
+                            memory:
+                              description: Memory request for GitLab Runner.
+                              type: string
+                        limits:
+                          description: Resources limits for GitLab Runner.
+                          type: object
+                          properties:
+                            cpu:
+                              description: CPU limit for GitLab Runner.
+                              type: string
+                            memory:
+                              description: Memory limit for GitLab Runner.
+                              type: string
+                        overwrite:
+                          description: Resources overwrite for GitLab Runner.
+                          type: object
+                          properties:
+                            requests:
+                              description: Resources requests max overwrite for GitLab Runner.
+                              type: object
+                              properties:
+                                cpu:
+                                  description: CPU request max overwrite for GitLab Runner.
+                                  type: string
+                                memory:
+                                  description: Memory request max overwrite for GitLab Runner.
+                                  type: string
+                            limits:
+                              description: Resources limits max overwrite for GitLab Runner.
+                              type: object
+                              properties:
+                                cpu:
+                                  description: CPU limit max overwrite for GitLab Runner.
+                                  type: string
+                                memory:
+                                  description: Memory limit max overwrite for GitLab Runner.
+                                  type: string
+                    taint:
+                      description: Configuration for taint.
+                      type: object
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether taint should be enabled.
+                          type: boolean
+                    values:
+                      description: |
+                        You can add custom values for GitLab Runner, they will be merged with roles/gitlab-runner/templates/values/
+                        https://docs.gitlab.com/runner/
+                        https://gitlab.com/gitlab-org/cloud-native/distroless/gitlab-runner
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
+                  type: object
+                global:
+                  description: Global configuration not specific to one service.
+                  properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Global instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Global configuration.
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for Global configuration, they will be merged with roles/gitops/rendering-apps-files/templates/global/
+                        https://github.com/cloud-pi-native/socle
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    environment:
+                      default: production
+                      description: Defines DSO environment type, i.e. development or production.
+                      type: string
+                    projectsRootDir:
+                      default:
+                        - forge
+                      description: |
+                        Defines root directory for projects in Gitlab and Vault.
+                        These values should NEVER be changed once a project is used !
+                        Projects will not be migrated automatically.
+                        Represented as array of strings (e.g., ['company', 'forge', 'projects'])
+                        Cannot be an empty Array
+                      items:
+                        type: string
+                      minItems: 1
+                      type: array
+                    rootDomain:
+                      description: |
+                        The top level of your domain. To expose Argo as "argo.example.com",
+                        the value should be ".example.com" (notice the leading dot).
+                      type: string
+                      default: .example.com
+                      pattern: "^\\..*$"
+                    infraRootDomain:
+                      description: |
+                        The top level of your domain for infrastructure tools. To expose Argo as "argo.example.com",
+                        the value should be ".example.com" (notice the leading dot).
+                      type: string
+                      default: .infra.example.com
+                      pattern: "^\\..*$"
+                    logs:
+                      description: Configuration for logs feature.
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether logs collection should be enabled.
+                          type: boolean
+                        endpoint:
+                          description: Endpoint where logs are aggregated for this environment.
+                          type: string
+                      type: object
+                      default: {}
+                    metrics:
+                      description: Configuration for metrics feature.
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether metrics should be enabled.
+                          type: boolean
+                        endpoint:
+                          description: Endpoint where metrics are aggregated for this environment.
+                          type: string
+                        additionalLabels:
+                          description: Adds additional labels if needed, when metrics are enabled.
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
+                      required:
+                        - enabled
+                      type: object
+                    alerting:
+                      description: Configuration for alerting feature.
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether alerting should be enabled.
+                          type: boolean
+                      required:
+                        - enabled
+                      type: object
+                    backup:
+                      description: Configuration for backup feature.
+                      properties:
+                        s3:
+                          description: S3 configuration to use for backups.
+                          properties:
+                            enabled:
+                              default: false
+                              description: Specifies whether S3 backup should be enabled.
+                              type: boolean
+                            endpointURL:
+                              description: Defines the s3 endpoint for vault backups.
+                              type: string
+                            bucketName:
+                              description: Defines the globally shared s3 bucket name for backups.
+                              type: string
+                              default: ""
+                            credentials:
+                              properties:
+                                name:
+                                  description: Defines the s3 kubernetes secret name used for vault backups.
+                                  type: string
+                                accessKeyId:
+                                  properties:
+                                    key:
+                                      description: Defines the s3 accessKeyId kubernetes secret key used for vault backups.
+                                      type: string
+                                  type: object
+                                secretAccessKey:
+                                  properties:
+                                    key:
+                                      description: Defines the s3 secretAccessKey kubernetes secret key used for vault backups.
+                                      type: string
+                                  type: object
+                              type: object
+                            endpointCA:
+                              properties:
+                                namespace:
+                                  description: |
+                                    Defines the namespace in which the secret containing cnpg backups' CA bundle
+                                    is located. This secret will be copied into each namespace which uses cnpg.
+                                  type: string
+                                name:
+                                  description: Defines the secret name containing s3 CA for cnpg backups.
+                                  type: string
+                                key:
+                                  description: Defines the secret key containing s3 CA for cnpg backups.
+                                  type: string
+                              type: object
+                          type: object
+                        velero:
+                          properties:
+                            enabled:
+                              description: Enable Velero backups.
+                              default: false
+                              type: boolean
+                          type: object
+                        vault:
+                          properties:
+                            enabled:
+                              description: Enable s3 vault backups.
+                              default: false
+                              type: boolean
+                            helmRepoUrl:
+                              description: Vault backup-utils helm repository url.
+                              type: string
+                            chartVersion:
+                              description: Vault backup-utils helm chart version (e.g., "1.12.2").
+                              type: string
+                            pathPrefix:
+                              description: Defines the s3 destination path for vault backups.
+                              type: string
+                              default: "vault"
+                            mcExtraArgs:
+                              description: Extra args to pass to minio cli for the backups.
+                              type: string
+                            cron:
+                              description: Defines the cron rule used for vault backups. By default it runs every 6 hours.
+                              type: string
+                              default: "0 */6 * * *"
+                            retentionPolicy:
+                              description: Defines retention policy for vault backups recurrences.
+                              type: string
+                              default: "30d"
+                          type: object
+                        vaultInfra:
+                          properties:
+                            enabled:
+                              description: Enable s3 vault infra backups.
+                              default: false
+                              type: boolean
+                            helmRepoUrl:
+                              description: Vault infra backup-utils helm repository url.
+                              type: string
+                            chartVersion:
+                              description: Vault infra backup-utils helm chart version (e.g., "1.12.2").
+                              type: string
+                            pathPrefix:
+                              description: Defines the s3 destination path for vault infra backups.
+                              type: string
+                              default: "vault-infra"
+                            mcExtraArgs:
+                              description: Extra args to pass to minio cli for the backups.
+                              type: string
+                            cron:
+                              description: Defines the cron rule used for vault infra backups. By default it runs every 6 hours.
+                              type: string
+                              default: "0 */6 * * *"
+                            retentionPolicy:
+                              description: Defines retention policy for vault infra backups recurrences.
+                              type: string
+                              default: "30d"
+                          type: object
+                        cnpg:
+                          properties:
+                            enabled:
+                              description: Enable s3 cnpg backups.
+                              default: false
+                              type: boolean
+                            pathPrefix:
+                              description: Defines the globally shared s3 destination path for cnpg backups.
+                              type: string
+                              default: "cnpg"
+                            cron:
+                              description: Defines the cron rule used for cnpg backups. By default it runs every 6 hours.
+                              type: string
+                              default: "0 0 */6 * * *"
+                            retentionPolicy:
+                              description: Defines retention policy for cnpg backups recurrences.
+                              type: string
+                              default: "30d"
+                            compression:
+                              description: Defines which compression algorithm should be used for cnpg backups.
+                              type: string
+                              enum:
+                                - none
+                                - gzip
+                                - bzip2
+                                - snappy
+                              default: "none"
+                          type: object
+                        gitlab:
+                          properties:
+                            enabled:
+                              description: Enable s3 gitlab backups.
+                              default: false
+                              type: boolean
+                            pathPrefix:
+                              description: Defines the s3 destination path for gitlab backups.
+                              type: string
+                              default: "gitlab"
+                            mcExtraArgs:
+                              description: Extra args to pass to minio cli for the backups.
+                              type: string
+                            cron:
+                              description: Defines the cron rule used for gitlab backups. By default it runs every 6 hours.
+                              type: string
+                              default: "0 */6 * * *"
+                            retentionPolicy:
+                              description: Defines retention policy for gitlab backups recurrences.
+                              type: string
+                              default: "30d"
+                            extraArgs:
+                              description: String of arguments to pass to the backup utility.
+                              type: string
+                          type: object
+                      type: object
+                    platform:
+                      default: openshift
+                      description: |
+                        Cluster platform, either the Openshift family (Openshift, OKD), or the rest
+                        (Kubernetes Vanilla, K3s, RKE2, EKS, GKE...).
+                      enum:
+                        - openshift
+                        - kubernetes
+                      type: string
+                    offline:
+                      default: false
+                      description: Specifies whether the cluster have access to the internet or not.
+                      type: boolean
+                    registry:
+                      description: Specifies the internal registry to use.
+                      type: string
+                    imagePullSecretsData:
+                      description: Specifies the credentials to use for pulling image, encoded in base64.
+                      type: string
+                    profile:
+                      description: Specifies security profile (e.g., cis).
+                      type: string
+                    gitOps:
+                      properties:
+                        repo:
+                          type: object
+                          properties:
+                            url:
+                              type: string
+                              description: URL of the Git repository to watch as GitOps source of truth.
+                            revision:
+                              type: string
+                              description: Branch or tag name to watch as GitOps source of truth.
+                            path:
+                              type: string
+                              description: Root directory to use as GitOps source of truth (must contains Application yamls and environment subdirectories).
+                        watchpointEnabled:
+                          default: true
+                          description: |
+                            Specifies whether we should interrupt GitOps installation to review some generated files.
+                            Installation will be interrupted if true, displaying an explanation message.
+                          type: boolean
+                        deploymentEnabled:
+                          default: false
+                          description: |
+                            Specifies whether the Socle deployment is GitOps or not.
+                          type: boolean
+                        envName:
+                          type: string
+                          description: Name of the current environment where resides this DSC instance.
+                        namespacePrefix:
+                          type: string
+                          description: Prefix for all namespaces in the current environment.
+                      required:
+                        - envName
+                        - namespacePrefix
+                      type: object
+                    dockerAccount:
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether we should enable the use of a Docker account for Argo CD.
+                          type: boolean
+                      type: object
+                    playwright:
+                      type: object
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether Playwright integration tests should be executed.
+                          type: boolean
+                        mattermost:
+                          type: object
+                          properties:
+                            url:
+                              description: The base URL of the Mattermost server (e.g., https://mattermost.example.com).
+                              type: string
+                            channelId:
+                              description: The ID of the Mattermost channel where test reports will be posted.
+                              type: string
+                            botToken:
+                              description: The Mattermost bot user token used to authenticate API requests.
+                              type: string
+                    smtp:
+                      properties:
+                        enabled:
+                          description: Specifies whether we should enable the use of a SMTP server.
+                          type: boolean
+                        host:
+                          description: The SMTP server host.
+                          type: string
+                        port:
+                          description: The SMTP server port.
+                          type: integer
+                        from:
+                          description: The email address used as the sender.
+                          type: string
+                        starttlsEnabled:
+                          description: Specifies whether we should enable tls encryption.
+                          type: boolean
+                        authentication:
+                          type: object
+                          properties:
+                            enabled:
+                              description: Specifies whether we should enable the authentication.
+                              type: boolean
+                      type: object
+                  required:
+                    - projectsRootDir
+                    - rootDomain
+                    - environment
+                    - metrics
+                    - alerting
+                    - platform
+                    - offline
+                    - gitOps
+                    - dockerAccount
+                    - smtp
+                  type: object
+                grafana:
+                  description: Configuration for Grafana instance.
+                  properties:
+                    namespace:
+                      description: The namespace for Grafana instance.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Grafana instance.
+                      type: string
+                    domain:
+                      description: The domain for Grafana instance.
+                      type: string
+                    grafanaPvcSize:
+                      description: Size for grafana persistent volume.
+                      type: string
+                    imageVersion:
+                      description: Grafana release version (e.g., "9.5.5").
+                      type: string
+                    helmRepoUrl:
+                      description: DSO Grafana instances helm repository url.
+                      type: string
+                    chartVersion:
+                      description: DSO Grafana instances release version (e.g., "9.5.5").
+                      type: string
+                  type: object
+                harbor:
+                  description: Configuration for Harbor.
+                  properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Harbor instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Harbor.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Harbor.
+                      type: string
+                    domain:
+                      description: The domain for Harbor.
+                      type: string
+                    helmRepoUrl:
+                      description: Harbor helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Harbor helm chart version (e.g., "1.12.2").
+                      type: string
+                    pvcRegistrySize:
+                      description: Size for registry persistent volume.
+                      type: string
+                    pvcJobLogSize:
+                      description: Size for jobLog persistent volume.
+                      type: string
+                    pvcDatabaseSize:
+                      description: Size for database persistent volume.
+                      type: string
+                    pvcRedisSize:
+                      description: Size for redis persistent volume.
+                      type: string
+                    pvcTrivySize:
+                      description: Size for trivy persistent volume.
+                      type: string
+                    s3ImageChartStorage:
+                      description: Define s3 storage backend used for registry to store images and charts.
+                      type: object
+                      properties:
+                        enabled:
+                          description: Specifies whether the s3ImageChartStorage is enabled.
+                          default: false
+                          type: boolean
+                        bucket:
+                          description: Defines the bucket.
+                          type: string
+                        region:
+                          description: Defines the region.
+                          type: string
+                        regionendpoint:
+                          description: Defines the region s3 endpoint for.
+                          type: string
+                    values:
+                      description: |
+                        You can add custom values for harbor, they will be merged with roles/harbor/templates/values/
+                        https://github.com/goharbor/harbor-helm
+                        https://github.com/goharbor/harbor-helm/blob/main/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    postgresPvcSize:
+                      description: Size for postgres data pvc.
+                      type: string
+                      default: 10Gi
+                    postgresWalMaxSlotKeepSize:
+                      description: |
+                        Maximum size of WAL files that replication slots are allowed to retain in
+                        the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount
+                        of WAL files. You can for instance set it to "9GB".
+                        https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Refer to postgresql.conf for memory units.
+                      type: string
+                    postgresWalPvcSize:
+                      description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
+                      type: string
+                    cnpg:
+                      description: Configuration for cnpg clusters.
+                      type: object
+                      properties:
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
+                  required:
+                    - pvcRegistrySize
+                    - installEnabled
+                  type: object
+                ingress:
+                  description: General configuration for ingress.
+                  properties:
+                    annotations:
+                      x-kubernetes-preserve-unknown-fields: true
+                      default: {}
+                      description: Additional annotations to add to all tools' ingresses.
+                      type: object
+                    className:
+                      description: Ingress class name to use for all ingresses.
+                      type: string
+                    labels:
+                      x-kubernetes-preserve-unknown-fields: true
+                      default: {}
+                      description: Additional labels to add to all tools' ingresses.
+                      type: object
+                    tls:
+                      description: TLS configuration for ingresses.
+                      properties:
+                        acme:
+                          description: acme/Let'sEncrypt configuration, only http challenge.
+                          properties:
+                            email:
+                              description: User email used for ACME.
+                              type: string
+                            environment:
+                              description: |
+                                Let's Encrypt environment to use for issuing certificates:
+                                - production : Use this value for production ready certificates.
+                                  Beware of rate limits. See: https://letsencrypt.org/docs/rate-limits/
+                                - staging : Use this value for testing purposes. It has significantly higher
+                                  rate limits. Beware of root certificates.
+                                  See: https://letsencrypt.org/docs/staging-environment/
+                              enum:
+                                - production
+                                - staging
+                              type: string
+                              default: production
+                          required:
+                            - email
+                            - environment
+                          type: object
+                        ca:
+                          description: CA configuration, need a valid CA key/cert in cert-manager namespace.
+                          properties:
+                            secretName:
+                              description: The TLS secret name available in cert-manager namespace.
+                              type: string
+                          required:
+                            - secretName
+                          type: object
+                        tlsSecret:
+                          description: Define the TLS secret name to use in ingress.
+                          properties:
+                            method:
+                              description: |
+                                How to retrieve the secret names:
+                                - in-namespace: you are in charge of secret replication in tools' namespaces
+                              enum:
+                                - in-namespace
+                              type: string
+                              default: in-namespace
+                            name:
+                              description: TLS secret name.
+                              type: string
+                          required:
+                            - name
+                            - method
+                          type: object
+                        type:
+                          default: none
+                          description: |
+                            - none: no TLS (seems like a bad idea, unstable deployment).
+                            - acme: TLS with HTTP ACME challenge ->
+                              https://cert-manager.io/docs/configuration/acme/http01/
+                            - ca: TLS with custom CA -> https://cert-manager.io/docs/configuration/ca/
+                            - tlsSecret: TLS with a custom TLS secret name specified in
+                              `ingress.spec.tls.secretName`, should be wildcard or include all hosts ->
+                              https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets
+                          enum:
+                            - none
+                            - acme
+                            - ca
+                            - tlsSecret
+                          type: string
+                      required:
+                        - type
+                      type: object
+                  type: object
+                keycloak:
+                  description: Configuration for Keycloak.
+                  properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Keycloak instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Keycloak.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Keycloak.
+                      type: string
+                    domain:
+                      description: The domain for Keycloak.
+                      type: string
+                    helmRepoUrl:
+                      description: Keycloak Bitnami helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Keycloak Bitnami chart version (e.g., "16.0.3").
+                      type: string
+                    postgresPvcSize:
+                      description: Size for postgres data pvc.
+                      type: string
+                      default: 10Gi
+                    postgresWalMaxSlotKeepSize:
+                      description: |
+                        Maximum size of WAL files that replication slots are allowed to retain in
+                        the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount
+                        of WAL files. You can for instance set it to "9GB".
+                        https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Refer to postgresql.conf for memory units.
+                      type: string
+                    postgresWalPvcSize:
+                      description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
+                      type: string
+                    pluginDownloadUrl:
+                      description: Plugins download Url.
+                      type: string
+                    providerDownloadUrl:
+                      description: Provider's download Url.
+                      type: string
+                    managementRealm:
+                      description: Keycloak management realm.
+                      type: string
+                    applicationRealm:
+                      description: Keycloak application realm.
+                      type: string
+                    usersGitOpsEnabled:
+                      description: Specifies whether we should manage users with GitOps.
+                      type: boolean
+                    values:
+                      description: |
+                        You can add custom values for keycloak, they will be merged with roles/keycloak/templates/values/
+                        https://github.com/bitnami/charts/tree/main/bitnami/keycloak
+                        https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    cnpg:
+                      description: Configuration for cnpg clusters.
+                      type: object
+                      properties:
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
+                  required:
+                    - installEnabled
+                  type: object
+                keycloakInfra:
+                  description: Configuration for Keycloak infrastructure instance.
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install Keycloak infrastructure instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Keycloak infrastructure instance.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Keycloak infrastructure instance.
+                      type: string
+                    domain:
+                      description: The domain for Keycloak infrastructure instance.
+                      type: string
+                    helmRepoUrl:
+                      description: Keycloak Bitnami helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Keycloak Bitnami chart version (e.g., "19.3.4").
+                      type: string
+                    postgresPvcSize:
+                      description: Size for postgres data pvc.
+                      type: string
+                      default: 10Gi
+                    postgresWalMaxSlotKeepSize:
+                      description: |
+                        Maximum size of WAL files that replication slots are allowed to retain in
+                        the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount
+                        of WAL files. You can for instance set it to "9GB".
+                        https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Refer to postgresql.conf for memory units.
+                      type: string
+                    postgresWalPvcSize:
+                      description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
+                      type: string
+                    pluginDownloadUrl:
+                      description: Plugins download Url.
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for keycloakInfra, they will be merged with roles/infra/keycloak-infra/templates/values/
+                        https://github.com/bitnami/charts/tree/main/bitnami/keycloak
+                        https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    cnpg:
+                      description: Configuration for cnpg clusters.
+                      type: object
+                      properties:
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
+                  required:
+                    - installEnabled
+                  type: object
+                kyverno:
+                  description: Configuration for Kyverno.
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install Kyverno instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Kyverno.
+                      type: string
+                    forcedInstall:
+                      description: |
+                        If set to true, Kyverno will be installed (or reinstalled) in the
+                        desired namespace regardless of its existing state.
+                        The default value is false, which means no forced installation will occur.
+                      default: false
+                      type: boolean
+                    helmRepoUrl:
+                      description: Kyverno helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Kyverno helm chart version (e.g., "3.1.4").
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for Kyverno, they will be merged with roles/kyverno/templates/values/
+                        https://github.com/kyverno/kyverno/blob/main/charts/kyverno
+                        https://github.com/kyverno/kyverno/blob/main/charts/kyverno/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
+                  type: object
+                nexus:
+                  description: Configuration for Nexus.
+                  properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Nexus instance.
+                      type: boolean
+                    helmRepoName:
+                      description: Nexus helm repository name (e.g., "stevehipwell").
+                      type: string
+                    helmRepoUrl:
+                      description: Nexus helm repository url (e.g., "https://stevehipwell.github.io/helm-charts/").
+                      type: string
+                    chartVersion:
+                      description: Nexus Helm chart version (e.g., "5.8.3").
+                      type: string
+                    chartReference:
+                      description: Helm chart reference (e.g., "stevehipwell/nexus3").
+                      type: string
+                    release:
+                      description: Nexus Helm release Name (e.g., "nexus").
+                      type: string
+                    namespace:
+                      description: The namespace for Nexus.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Nexus.
+                      type: string
+                    domain:
+                      description: The domain for Nexus.
+                      type: string
+                    storageSize:
+                      description: Size for nexus persistent volume.
+                      type: string
+                    proxyEnabled:
+                      description: Whether or not to enable the nexus docker proxy cache.
+                      type: boolean
+                    proxyCacheSize:
+                      description: Size for nexus proxy cache persistent volume.
+                      type: string
+                    imageTag:
+                      description: Nexus version based on image tag (e.g., "3.56.0").
+                      type: string
+                    ingressAnnotations:
+                      description: |
+                        Custom annotations for nexus ingress, they will be pushed into the nexus
+                        ingress rule combined to `dsc.ingress.annotations`.
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    values:
+                      description: |
+                        You can add custom values for nexus, they will be merged with roles/nexus/templates/values/
+                        https://github.com/stevehipwell/helm-charts/
+                        https://github.com/stevehipwell/helm-charts/blob/main/charts/nexus3/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
+                  type: object
+                prometheus:
+                  description: Minimal configuration for prometheus CRDs.
+                  properties:
+                    crd:
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - external
+                            - managed
+                          default: external
+                        version:
+                          type: string
+                      type: object
+                  type: object
+                observatorium:
+                  description: Configuration for Observatorium.
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install Observatorium instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Observatorium.
+                      type: string
+                    helmRepoUrl:
+                      description: Observatorium helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Observatorium helm chart version (e.g., "0.25.0").
+                      type: string
+                    observabilityChartVersion:
+                      description: Dso-observability helm chart version (e.g., "0.1.8").
+                      type: string
+                    observabilityPluginVersion:
+                      description: |
+                        Console-plugin-observability release version (e.g., "v1.1.4").
+                        https://github.com/cloud-pi-native/console-plugin-observability
+                      type: string
+                    apiConfig:
+                      description: Observatorium global.api.config.
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                      type: object
+                    reverseProxy:
+                      description: |
+                        Configuration for reverse proxy between Observatorium and metrics/logs datasource.
+                        This is needed until bug is solved: https://github.com/observatorium/api/issues/739
+                      type: object
+                      properties:
+                        enabled:
+                          default: false
+                          description: Enable or disable reverse proxy configuration.
+                          type: boolean
+                        logsHost:
+                          description: Host where logs are aggregated for this environment.
+                          type: string
+                        metricsHost:
+                          description: Host where metrics are aggregated for this environment.
+                          type: string
+                  required:
+                    - installEnabled
+                  type: object
+                proxy:
+                  description: Proxy configuration for tools.
+                  properties:
+                    enabled:
+                      default: false
+                      description: Enable or disable proxy on tools.
+                      type: boolean
+                    host:
+                      description: Distant proxy ip/hostname.
+                      type: string
+                    http_proxy:
+                      description: URL for http traffic. Format http://<host>:<port>/
+                      type: string
+                    https_proxy:
+                      description: URL for https traffic. Format http://<host>:<port>/
+                      type: string
+                    no_proxy:
+                      default: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain
+                      description: |
+                        Networks destination excluded by the proxy. Not so easy to configure.
+                        Default is .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain
+                      type: string
+                    port:
+                      description: Distant proxy port listening.
+                      type: string
+                  type: object
+                sonarqube:
+                  description: Configuration for SonarQube.
+                  properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install SonarQube instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for SonarQube.
+                      type: string
+                    subDomain:
+                      description: The subdomain for SonarQube.
+                      type: string
+                    domain:
+                      description: The domain for SonarQube.
+                      type: string
+                    helmRepoUrl:
+                      description: SonarQube helm repository url.
+                      type: string
+                    chartVersion:
+                      description: SonarQube helm chart version (e.g., "10.2.1+800").
+                      type: string
+                    postgresPvcSize:
+                      description: Size for postgres data pvc.
+                      type: string
+                      default: 10Gi
+                    postgresWalMaxSlotKeepSize:
+                      description: |
+                        Maximum size of WAL files that replication slots are allowed to retain in
+                        the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount
+                        of WAL files. You can for instance set it to "9GB".
+                        https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Refer to postgresql.conf for memory units.
+                      type: string
+                    postgresWalPvcSize:
+                      description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
+                      type: string
+                    pluginDownloadUrl:
+                      description: Plugins download Url.
+                      type: string
+                    prometheusJavaagentVersion:
+                      description: Prometheus javaagent version.
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for sonarqube, they will be merged with roles/sonarqube/templates/values/
+                        https://github.com/SonarSource/helm-chart-sonarqube/tree/master/charts/sonarqube
+                        https://github.com/SonarSource/helm-chart-sonarqube/blob/master/charts/sonarqube/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    cnpg:
+                      description: Configuration for cnpg clusters.
+                      type: object
+                      properties:
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
+                  required:
+                    - installEnabled
+                  type: object
+                vault:
+                  description: Configuration for Vault.
+                  properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Vault instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Vault.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Vault.
+                      type: string
+                    domain:
+                      description: The domain for Vault.
+                      type: string
+                    helmRepoUrl:
+                      description: Hashicorp Vault helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Hashicorp Vault helm chart version (e.g., "0.25.0").
+                      type: string
+                    pvcSize:
+                      description: Size for Vault persistent volume.
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for vault, they will be merged with roles/vault/templates/values/
+                        https://developer.hashicorp.com/vault/docs/platform/k8s/helm
+                        https://github.com/hashicorp/vault-helm/blob/main/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
+                  type: object
+                vaultInfra:
+                  description: Configuration for Vault infrastructure instance.
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install Vault infrastructure instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Vault infrastructure instance.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Vault infrastructure instance.
+                      type: string
+                    domain:
+                      description: The domain for Vault infrastructure instance.
+                      type: string
+                    helmRepoUrl:
+                      description: Hashicorp Vault helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Hashicorp Vault helm chart version (e.g., "0.25.0").
+                      type: string
+                    pvcSize:
+                      description: Size for Vault infrastructure instance persistent volume.
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for vaultInfra, they will be merged with roles/infra/vault-infra/templates/values/
+                        https://developer.hashicorp.com/vault/docs/platform/k8s/helm
+                        https://github.com/hashicorp/vault-helm/blob/main/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
+                  type: object
+              required:
+                - global
+                - ingress
+              type: object
+          required:
+            - spec
+            - metadata
+          type: object
+      served: true
+      storage: true
