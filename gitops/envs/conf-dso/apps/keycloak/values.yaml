@@ -79,6 +79,8 @@ keycloak:
   extraEnvVars:
   - name: KC_DB
     value: postgres
+  - name: KC_LOG_LEVEL
+    value: DEBUG
   - name: KC_HOSTNAME
     value: keycloak.polyops.fr
   - name: KC_HOSTNAME_STRICT
@@ -147,8 +149,8 @@ keycloak:
       value: "true"
     - name: KC_HEALTH_ENABLED
       value: "true"
-    - name: KC_METRICS_ENABLED
-      value: "true"
+    - name: KC_LOG_LEVEL
+      value: DEBUG
     ingressClassName: traefik
     labels:
       app: keycloak
