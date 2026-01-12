@@ -44,66 +44,56 @@ cpn-ansible-job:
       tag: '1'
 
 keycloak:
-  replicas: 1
+  auth:
+    adminUser: admin
+    existingSecret: keycloak
+    passwordSecretKey: admin-password
+  
+  replicaCount: 1
   
   image:
-    repository: quay.io/keycloak/keycloak
-    tag: "26.0.7"
+    registry: docker.io
+    repository: bitnami/keycloak
     pullPolicy: IfNotPresent
   
-  command:
-    - "/opt/keycloak/bin/kc.sh"
+  production: false
   
-  args:
-    - "start"
-    - "--optimized"
+  proxy: edge
   
-  extraEnv: |
-    - name: KC_DB
-      value: postgres
-    - name: KC_DB_URL_HOST
-      value: pg-cluster-keycloak-rw
-    - name: KC_DB_URL_DATABASE
-      value: keycloak
-    - name: KC_DB_USERNAME
-      valueFrom:
-        secretKeyRef:
-          name: pg-cluster-keycloak-app
-          key: username
-    - name: KC_DB_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: pg-cluster-keycloak-app
-          key: password
-    - name: KC_HOSTNAME
-      value: keycloak.polyops.fr
-    - name: KC_HOSTNAME_STRICT
-      value: "false"
-    - name: KC_PROXY_HEADERS
-      value: xforwarded
-    - name: KC_HTTP_ENABLED
-      value: "true"
-    - name: KC_HEALTH_ENABLED
-      value: "true"
-    - name: KEYCLOAK_ADMIN
-      value: admin
-    - name: KEYCLOAK_ADMIN_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: keycloak
-          key: admin-password
-    - name: JAVA_OPTS_APPEND
-      value: "-Djgroups.dns.query=keycloak-headless"
+  httpRelativePath: /
   
-  ingress:
+  extraEnvVars:
+  - name: KC_DB
+    value: postgres
+  - name: KC_HOSTNAME
+    value: keycloak.polyops.fr
+  - name: KC_HOSTNAME_STRICT
+    value: "false"
+  - name: KC_PROXY
+    value: edge
+  - name: KC_HTTP_ENABLED
+    value: "true"
+  - name: KEYCLOAK_PRODUCTION
+    value: "false"
+  
+  externalDatabase:
+    host: pg-cluster-keycloak-rw
+    port: 5432
+    database: keycloak
+    existingSecret: pg-cluster-keycloak-app
+    existingSecretUserKey: username
+    existingSecretPasswordKey: password
+  
+  postgresql:
     enabled: false
   
   service:
     type: ClusterIP
-    httpPort: 8080
+    ports:
+      http: 8080
   
-  serviceHeadless:
-    enabled: true
+  ingress:
+    enabled: false
   
   resources:
     limits:
@@ -112,42 +102,35 @@ keycloak:
       memory: 1024Mi
   
   livenessProbe:
-    httpGet:
-      path: /health/live
-      port: 8080
+    enabled: true
     initialDelaySeconds: 300
+    periodSeconds: 10
     timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
   
   readinessProbe:
-    httpGet:
-      path: /health/ready
-      port: 8080
+    enabled: true
     initialDelaySeconds: 30
+    periodSeconds: 10
     timeoutSeconds: 1
+    failureThreshold: 3
+    successThreshold: 1
   
-  postgresql:
+  containerSecurityContext:
     enabled: false
   
-  extraVolumes: |
-    - name: realm-ext-provider
-      emptyDir: {}
+  podSecurityContext:
+    enabled: false
   
-  extraVolumeMounts: |
-    - name: realm-ext-provider
-      mountPath: /opt/keycloak/providers
+  rbac:
+    create: false
   
-  extraInitContainers: |
-    - name: realm-ext-provider
-      image: busybox:1.36
-      imagePullPolicy: IfNotPresent
-      command:
-        - sh
-      args:
-        - -c
-        - |
-          echo "Skipping theme download for now"
-          touch /providers/keycloak-theme-dsfr.jar
-          touch /providers/keycloak-franceconnect.jar
-      volumeMounts:
-        - name: realm-ext-provider
-          mountPath: /providers
+  serviceAccount:
+    create: true
+  
+  metrics:
+    enabled: false
+  
+  keycloakConfigCli:
+    enabled: false

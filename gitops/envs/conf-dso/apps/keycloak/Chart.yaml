@@ -6,8 +6,8 @@ dependencies:
   version: 0.3.1
 - alias: keycloak
   name: keycloak
-  repository: https://codecentric.github.io/helm-charts
-  version: 2.4.0
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 22.2.3
 - alias: cpn-ansible-job
   name: cpn-job
   repository: https://cloud-pi-native.github.io/helm-charts
