@@ -71,8 +71,7 @@ sonarqube:
   fullnameOverride: sonarqube-sonarqube
   image:
     pullPolicy: IfNotPresent
-    repository: docker.io
-      docker.io/sonarqube
+    repository: docker.io/sonarqube
   ingress:
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: 64m

@@ -95,7 +95,6 @@ keycloak:
   image:
     pullPolicy: IfNotPresent
     registry: docker.io
-      docker.io
     repository: bitnamilegacy/keycloak
   ingress:
     annotations:
@@ -141,8 +140,7 @@ keycloak:
       '
     command:
     - sh
-    image: docker.io
-      docker.io/curlimages/curl:8.12.1
+    image: docker.io/curlimages/curl:8.12.1
     imagePullPolicy: IfNotPresent
     name: realm-ext-provider
     volumeMounts:
