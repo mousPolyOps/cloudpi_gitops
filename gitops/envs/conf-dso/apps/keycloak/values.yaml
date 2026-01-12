@@ -2,6 +2,7 @@ cluster:
   cluster:
     enablePDB: false
     imageName: ghcr.io/cloudnative-pg/postgresql:16.2
+    instances: 1
     initdb:
       database: keycloak
       owner: keycloak
@@ -211,7 +212,7 @@ keycloak:
     periodSeconds: 10
     successThreshold: 1
     timeoutSeconds: 1
-  replicaCount: 3
+  replicaCount: 1
   resources:
     limits:
       memory: 2048Mi
