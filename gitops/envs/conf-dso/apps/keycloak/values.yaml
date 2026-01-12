@@ -77,7 +77,7 @@ keycloak:
     port: 5432
   extraEnvVars:
   - name: DSFR_THEME_HOME_URL
-    value: https://docker.io
+    value: https://keycloak.polyops.fr
   - name: DSFR_THEME_SERVICE_TITLE
     value: Cloud Pi Native
   - name: DSFR_THEME_BRAND_TOP
@@ -118,7 +118,7 @@ keycloak:
       path: /realms/master/
       pathType: Prefix
     extraRules: []
-    hostname: docker.io
+    hostname: keycloak.polyops.fr
     ingressClassName: traefik
     labels:
       app: keycloak
