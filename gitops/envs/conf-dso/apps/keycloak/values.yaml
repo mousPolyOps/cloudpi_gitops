@@ -60,17 +60,7 @@ keycloak:
     enabled: true
     stackFile: ''
     stackName: kubernetes
-  command:
-    - /bin/bash
-    - -c
-    - |
-      /opt/bitnami/scripts/keycloak/run.sh start \
-      --verbose \
-      --optimized=false \
-      --db=postgres \
-      --hostname=keycloak.polyops.fr \
-      --proxy-headers=xforwarded \
-      --http-enabled=true
+  command: []
   configuration: ''
   containerPorts:
     http: 8080
@@ -103,6 +93,8 @@ keycloak:
     value: "true"
   - name: KC_BOOTSTRAP_ADMIN_USERNAME
     value: admin
+  - name: KC_HTTP_RELATIVE_PATH
+    value: /
   - name: DSFR_THEME_HOME_URL
     value: https://keycloak.polyops.fr
   - name: DSFR_THEME_SERVICE_TITLE
