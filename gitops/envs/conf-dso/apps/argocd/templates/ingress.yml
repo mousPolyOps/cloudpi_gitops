@@ -1,13 +1,33 @@
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
 metadata:
   name: argo-ingress
   namespace: dso-argocd
-  annotations:
-    route.openshift.io/termination: edge
-  labels:
 spec:
-  ingressClassName: traefik
-  rules:
-    - host: docker.io
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host(`docker.io`)
+    services:
+    - name: conf-dso-argocd-server
+      port: 80
+  tls:
+    secretName: argo-ingress-tls
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: argo-appset-ingress
+  namespace: dso-argocd
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host(`appset.docker.io`)
+    services:
+    - name: conf-dso-argocd-applicationset-controller
+      port: 7000
+  tls:
+    secretName: argo-appset-ingress-tls

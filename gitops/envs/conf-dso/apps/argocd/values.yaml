@@ -78,6 +78,12 @@ argocd:
         requestedScopes: ["openid", "generic"]
         name: Keycloak
         clientID: docker.io
+        clientSecret: docker.io
+# END ANSIBLE MANAGED BLOCK: resource.exclusions, oidc.config and resource.customizations
+      admin.enabled: 'false'
+      clusterResources: 'true'
+      kustomize.buildOptions: --enable-helm
+      url: https://docker.io
       users.anonymous.enabled: 'false'
     params:
       server.insecure: true

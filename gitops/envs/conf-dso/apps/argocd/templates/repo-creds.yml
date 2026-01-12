@@ -25,3 +25,4 @@ stringData:
   type: helm
   enableOCI: "true"
   username: docker.io
+  password: docker.io

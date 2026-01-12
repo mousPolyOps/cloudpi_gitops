@@ -29,3 +29,13 @@ glexporter:
         openshift:
           adaptSecurityContext: force
       imageRegistry: docker.io
+    image:
+      repository: bitnamilegacy/redis
+    master:
+      podAntiAffinityPreset: soft
+  serviceMonitor:
+    enabled: true
+    endpoints:
+    - interval: 30s
+      path: /metrics
+      port: http

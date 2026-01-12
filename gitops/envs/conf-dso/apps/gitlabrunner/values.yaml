@@ -10,7 +10,10 @@ gitlabrunner:
           topologyKey: kubernetes.io/hostname
         weight: 100
   fullnameOverride: gitlab-runner
-  gitlabUrl: https://docker.io
+  gitlabUrl: https://docker.io/
+  image:
+    registry: docker.io
+      {.repository.gitlab}>
   rbac:
     create: true
     podSecurityPolicy:

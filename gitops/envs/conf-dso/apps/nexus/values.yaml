@@ -112,3 +112,7 @@ nexus3:
     - containerPort: 5000
       hosts:
       - docker.io
+      name: dockerproxy
+      port: 5000
+    port: 8081
+    type: ClusterIP

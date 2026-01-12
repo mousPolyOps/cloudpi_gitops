@@ -90,7 +90,7 @@ harbor:
     ingress:
       annotations:
         route.openshift.io/termination: edge
-      className: docker.io
+      className: traefik
       hosts:
         core: docker.io
         notary: docker.io
@@ -102,7 +102,24 @@ harbor:
     tls:
       enabled: false
     type: ingress
-  externalURL: https://docker.io/goharbor/harbor-jobservice
+  externalURL: https://docker.io
+  fullnameOverride: harbor
+  harborAdminPassword: docker.io
+  jobservice:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/component: jobservice
+                app.kubernetes.io/instance: sandbox-dso-harbor
+                app.kubernetes.io/name: harbor
+            topologyKey: kubernetes.io/hostname
+          weight: 100
+    image:
+      repository: docker.io
+        {.repository.docker}>/goharbor/harbor-jobservice
     jobLoggers:
     - stdout
     replicas: 2

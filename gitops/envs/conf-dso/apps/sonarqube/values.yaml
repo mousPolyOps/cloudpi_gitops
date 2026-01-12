@@ -68,7 +68,12 @@ sonarqube:
   containerSecurityContext:
     runAsGroup: null
     runAsUser: null
-  curlContainerImage: docker.io/sonarqube
+  curlContainerImage: docker.io/curlimages/curl:8.11.0
+  fullnameOverride: sonarqube-sonarqube
+  image:
+    pullPolicy: IfNotPresent
+    repository: docker.io
+      {.repository.docker}>/sonarqube
   ingress:
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: 64m
@@ -120,3 +125,16 @@ sonarqube:
     sonar.auth.oidc.allowUsersToSignUp: 'true'
     sonar.auth.oidc.autoLogin: 'false'
     sonar.auth.oidc.clientId.secured: docker.io
+    sonar.auth.oidc.clientSecret.secured: docker.io
+    sonar.auth.oidc.enabled: 'true'
+    sonar.auth.oidc.groupsSync: 'true'
+    sonar.auth.oidc.groupsSync.claimName: groups
+    sonar.auth.oidc.issuerUri: https://docker.io/realms/dso
+    sonar.auth.oidc.loginStrategy: Email
+    sonar.auth.oidc.loginStrategy.customClaim.name: upn
+    sonar.auth.oidc.scopes: openid generic
+    sonar.core.serverBaseURL: https://docker.io
+    sonar.plugins.risk.consent: ACCEPTED
+  sonarWebContext: /
+  sonarqubeFolder: /opt/sonarqube
+  terminationGracePeriodSeconds: 60

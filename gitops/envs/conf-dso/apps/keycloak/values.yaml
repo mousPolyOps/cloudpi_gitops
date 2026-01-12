@@ -135,7 +135,15 @@ keycloak:
     - -c
     - 'mkdir -p /emptydir/app-providers-dir && \
 
-      curl -k -fsSL -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar docker.io/curlimages/curl:8.12.1
+      curl -k -fsSL -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar docker.io && \
+
+      curl -k -fsSL -o /emptydir/app-providers-dir/keycloak-franceconnect.jar docker.io
+
+      '
+    command:
+    - sh
+    image: docker.io
+      {.repository.docker}>/curlimages/curl:8.12.1
     imagePullPolicy: IfNotPresent
     name: realm-ext-provider
     volumeMounts:

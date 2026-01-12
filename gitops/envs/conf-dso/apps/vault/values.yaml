@@ -48,7 +48,14 @@ vault:
       enable: true
       size: 23Gi
     ha:
-      apiAddr: https://docker.io/hashicorp/vault
+      apiAddr: https://docker.io
+      enabled: true
+      raft:
+        enabled: true
+      replicas: 3
+    image:
+      repository: docker.io
+        {.repository.docker}>/hashicorp/vault
     route:
       enabled: false
     standalone:

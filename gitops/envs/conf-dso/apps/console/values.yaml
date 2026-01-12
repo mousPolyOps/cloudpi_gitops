@@ -131,10 +131,16 @@ console:
   ingress:
     annotations:
       route.openshift.io/termination: edge
-    className: docker.io
+    className: traefik
     enabled: true
     hosts:
     - docker.io
+    labels: {}
+  nameOverride: conf-dso-cpn-console
+  postgres:
+    image:
+      registry: docker.io
+        {.repository.ghcr}>
       repository: postgres:15.3
   postgresql:
     architecture: standalone

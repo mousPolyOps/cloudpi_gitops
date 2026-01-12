@@ -15,6 +15,9 @@ awx:
       create: true
     spec:
       control_plane_ee_image: docker.io/ansible/awx-ee:24.6.1
+      ee_images:
+      - image: docker.io
+          {.repository.quay}>/ansible/awx-ee:24.6.1
         name: AWX EE (24.6.1)
       extra_settings:
       - setting: CSRF_TRUSTED_ORIGINS
@@ -25,11 +28,13 @@ awx:
       ingress_annotations: '- {''route.openshift.io/termination'': ''edge''}
 
         '
-      ingress_class_name: docker.io
+      ingress_class_name: traefik
       ingress_hosts:
       - hostname: docker.io
       ingress_type: ingress
-      init_container_image: docker.io/redis
+      init_container_image: docker.io/ansible/awx-ee
+      init_container_image_version: 24.6.1
+      redis_image: docker.io/redis
       redis_image_version: '7'
       service_type: ClusterIP
 cluster:

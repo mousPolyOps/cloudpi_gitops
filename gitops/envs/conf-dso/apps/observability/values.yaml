@@ -70,4 +70,50 @@ observatorium:
       groups:
       - /admin
       id: prod-infra
-      issuerURL: https://docker.io
+      issuerURL: https://docker.io/realms/dso
+      name: prod-infra
+      usernameClaim: preferred_username
+    loglevel: info
+  global:
+    projects:
+      console:
+        envs:
+          hprod:
+            groups:
+            - /admin
+            - /admin
+            tenants:
+              hprod-dso: {}
+          prod:
+            groups:
+            - /admin
+            - /admin
+            tenants:
+              prod-dso: {}
+        projectName: dso
+        projectRepository:
+          path: roles/gitops/rendering-apps-files/templates/dashboard
+          url: https://github.com/cloud-pi-native/socle.git
+  ingress:
+    enabled: false
+  logs:
+    enabled: false
+    read:
+      endpoint: docker.io
+    rules:
+      endpoint: docker.io
+    tail:
+      endpoint: docker.io
+    write:
+      endpoint: docker.io
+  metrics:
+    alertmanager:
+      endpoint: docker.io
+    enabled: false
+    read:
+      endpoint: docker.io
+    rules:
+      endpoint: docker.io
+    tenantHeader: X-Scope-OrgId
+    write:
+      endpoint: docker.io
