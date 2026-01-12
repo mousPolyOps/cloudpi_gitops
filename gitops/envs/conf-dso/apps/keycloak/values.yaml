@@ -114,8 +114,9 @@ keycloak:
   httpRelativePath: /
   image:
     pullPolicy: IfNotPresent
-    registry: docker.io
-    repository: bitnamilegacy/keycloak
+    registry: quay.io
+    repository: keycloak/keycloak
+    tag: "26.0.7"
   ingress:
     annotations:
       route.openshift.io/termination: edge
