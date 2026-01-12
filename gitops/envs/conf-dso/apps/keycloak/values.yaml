@@ -131,12 +131,14 @@ keycloak:
   initContainers:
   - args:
     - -c
-    - 'mkdir -p /emptydir/app-providers-dir && touch /emptydir/app-providers-dir/keycloak-theme-dsfr.jar && touch /emptydir/app-providers-dir/keycloak-franceconnect.jar'
+    - 'mkdir -p /emptydir/app-providers-dir && chmod 777 /emptydir/app-providers-dir && touch /emptydir/app-providers-dir/keycloak-theme-dsfr.jar && touch /emptydir/app-providers-dir/keycloak-franceconnect.jar'
     command:
     - sh
     image: docker.io/curlimages/curl:8.12.1
     imagePullPolicy: IfNotPresent
     name: realm-ext-provider
+    securityContext:
+      runAsUser: 0
     volumeMounts:
     - mountPath: /emptydir
       name: empty-dir
