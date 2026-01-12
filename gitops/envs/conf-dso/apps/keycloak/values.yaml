@@ -106,7 +106,7 @@ keycloak:
     value: cloudpinative-relations@interieur.gouv.fr
   extraEnvVarsCM: ''
   extraEnvVarsSecret: ''
-  extraStartupArgs: ''
+  extraStartupArgs: '--optimized'
   fullnameOverride: keycloak
   global:
     security:
