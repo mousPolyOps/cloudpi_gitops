@@ -60,7 +60,15 @@ keycloak:
     enabled: true
     stackFile: ''
     stackName: kubernetes
-  command: []
+  command:
+    - /opt/bitnami/scripts/keycloak/run.sh
+    - start
+    - --verbose
+    - --optimized=false
+    - --db=postgres
+    - --hostname=keycloak.polyops.fr
+    - --proxy-headers=xforwarded
+    - --http-enabled=true
   configuration: ''
   containerPorts:
     http: 8080
