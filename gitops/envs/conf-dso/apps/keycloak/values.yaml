@@ -60,6 +60,19 @@ keycloak:
     enabled: true
     stackFile: ''
     stackName: kubernetes
+  command:
+    - /bin/bash
+    - -c
+    - |
+      /opt/bitnami/keycloak/bin/kc.sh start-dev \
+        --http-enabled=true \
+        --hostname-strict=false \
+        --proxy-headers=xforwarded \
+        --db=postgres \
+        --db-url-host=${DB_ADDR} \
+        --db-url-database=${DB_DATABASE} \
+        --db-username=${DB_USER} \
+        --db-password=${DB_PASSWORD}
   configuration: ''
   containerPorts:
     http: 8080
