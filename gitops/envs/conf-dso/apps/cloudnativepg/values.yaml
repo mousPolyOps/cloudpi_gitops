@@ -14,7 +14,6 @@ cloudnativepg:
     runAsUser: 1000957777
   fullnameOverride: cloudnative-pg
   image:
-    registry: docker.io
-      {.repository.ghcr}>/cloudnative-pg/cloudnative-pg
+    registry: ghcr.io/cloudnative-pg/cloudnative-pg
   nameOverride: cloudnative-pg
   replicaCount: 3

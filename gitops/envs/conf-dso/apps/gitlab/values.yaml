@@ -1,8 +1,7 @@
 cluster:
   cluster:
     enablePDB: false
-    imageName: docker.io
-      {.repository.ghcr}>/cloudnative-pg/postgresql:16.2
+    imageName: ghcr.io/cloudnative-pg/postgresql:16.2
     initdb:
       database: gitlabhq_production
       owner: gitlab
@@ -52,7 +51,7 @@ cpn-ansible-job:
         name: ansible-secret
     image:
       repository: docker.io
-        {.repository.ghcr}>/cloud-pi-native/git-ansible
+        ghcr.io/cloud-pi-native/git-ansible
       tag: '1'
 gitlab:
   affinity:
@@ -77,9 +76,9 @@ gitlab:
     prepend: 'false'
     pullPolicy: IfNotPresent
     registry: docker.io
-      {.repository.gitlab}>
+      registry.gitlab.com
     repository: docker.io
-      {.repository.gitlabOperator}>/cloud-native
+      registry.gitlab.com/cloud-native
     tag: 2.4.1
   manager:
     debug:
@@ -87,7 +86,7 @@ gitlab:
     kubeRbacProxy:
       image:
         registry: docker.io
-          {.repository.gitlab}>
+          registry.gitlab.com
     serviceAccount:
       annotations: {}
       create: true

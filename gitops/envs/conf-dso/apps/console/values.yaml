@@ -1,8 +1,7 @@
 cluster:
   cluster:
     enablePDB: false
-    imageName: docker.io
-      {.repository.ghcr}>/cloudnative-pg/postgresql:16.2
+    imageName: ghcr.io/cloudnative-pg/postgresql:16.2
     initdb:
       database: dso-console-db
       owner: dso
@@ -42,7 +41,7 @@ console:
     healthcheckPath: /
     image:
       repository: docker.io
-        {.repository.ghcr}>/cloud-pi-native/console/client
+        ghcr.io/cloud-pi-native/console/client
     livenessProbe:
       enabled: true
       failureThreshold: 3
@@ -140,7 +139,7 @@ console:
   postgres:
     image:
       registry: docker.io
-        {.repository.ghcr}>
+        ghcr.io
       repository: postgres:15.3
   postgresql:
     architecture: standalone
@@ -176,7 +175,7 @@ console:
     healthcheckPath: /api/v1/healthz
     image:
       repository: docker.io
-        {.repository.ghcr}>/cloud-pi-native/console/server
+        ghcr.io/cloud-pi-native/console/server
     livenessProbe:
       enabled: true
       failureThreshold: 3

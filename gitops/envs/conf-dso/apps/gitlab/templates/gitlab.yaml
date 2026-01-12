@@ -140,12 +140,12 @@ spec:
       installCertmanager: true
       minio:
         image: docker.io
-          {.repository.minio}>/minio
+          docker.io/minio
         ingress:
           tls: {}
         minioMc:
           image: docker.io
-            {.repository.minio}>/mc
+            docker.io/mc
       nginx-ingress:
         enabled: false
       postgresql:

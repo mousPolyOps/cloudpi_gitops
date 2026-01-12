@@ -21,7 +21,7 @@ glexporter:
   fullnameOverride: glexporter
   image:
     repository: docker.io
-      {.repository.quay}>/mvisonneau/gitlab-ci-pipelines-exporter
+      quay.io/mvisonneau/gitlab-ci-pipelines-exporter
   redis:
     fullnameOverride: glexporter-redis
     global:

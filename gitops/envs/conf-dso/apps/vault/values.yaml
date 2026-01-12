@@ -21,7 +21,7 @@ cpn-ansible-job:
         name: ansible-secret
     image:
       repository: docker.io
-        {.repository.ghcr}>/cloud-pi-native/git-ansible
+        ghcr.io/cloud-pi-native/git-ansible
       tag: '1'
 vault:
   csi:
@@ -30,17 +30,17 @@ vault:
         repository: docker.io/hashicorp/vault
     image:
       repository: docker.io
-        {.repository.docker}>/hashicorp/vault-csi-provider
+        docker.io/hashicorp/vault-csi-provider
   fullnameOverride: conf-dso-vault
   global:
     openshift: true
   injector:
     agentImage:
       repository: docker.io
-        {.repository.docker}>/hashicorp/vault
+        docker.io/hashicorp/vault
     image:
       repository: docker.io
-        {.repository.docker}>/hashicorp/vault-k8s
+        docker.io/hashicorp/vault-k8s
   server:
     auditStorage:
       enable: true
@@ -55,7 +55,7 @@ vault:
       replicas: 3
     image:
       repository: docker.io
-        {.repository.docker}>/hashicorp/vault
+        docker.io/hashicorp/vault
     route:
       enabled: false
     standalone:

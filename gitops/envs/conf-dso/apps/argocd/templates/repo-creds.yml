@@ -8,7 +8,7 @@ metadata:
   namespace: dso-argocd
 type: Opaque
 stringData:
-  password: docker.io
+  password: ZG9ja2VyLmlv
   url: "https://gitlab.polyops.fr/forge"
   username: "root"
 ---
@@ -20,9 +20,9 @@ metadata:
   name: oci-dockerhub-creds
   namespace: dso-argocd
 stringData:
-  url: registry-1.docker.io
+  url: registry-1.ZG9ja2VyLmlv
   name: bitnamicharts
   type: helm
   enableOCI: "true"
-  username: docker.io
-  password: docker.io
+  username: ZG9ja2VyLmlv
+  password: ZG9ja2VyLmlv

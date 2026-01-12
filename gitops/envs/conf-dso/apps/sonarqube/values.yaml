@@ -1,8 +1,7 @@
 cluster:
   cluster:
     enablePDB: false
-    imageName: docker.io
-      {.repository.ghcr}>/cloudnative-pg/postgresql:16.2
+    imageName: ghcr.io/cloudnative-pg/postgresql:16.2
     initdb:
       database: sonardb
       owner: dso_admin
@@ -38,7 +37,7 @@ cpn-ansible-job:
         name: ansible-secret
     image:
       repository: docker.io
-        {.repository.ghcr}>/cloud-pi-native/git-ansible
+        ghcr.io/cloud-pi-native/git-ansible
       tag: '1'
 sonarqube:
   OpenShift:
@@ -73,7 +72,7 @@ sonarqube:
   image:
     pullPolicy: IfNotPresent
     repository: docker.io
-      {.repository.docker}>/sonarqube
+      docker.io/sonarqube
   ingress:
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: 64m

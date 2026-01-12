@@ -7,6 +7,6 @@ metadata:
   namespace: infra-argocd
 type: Opaque
 stringData:
-  password: docker.io
+  password: ZG9ja2VyLmlv
   url: "https://gitlab.polyops.fr/observability/observability.git"
   username: "root"

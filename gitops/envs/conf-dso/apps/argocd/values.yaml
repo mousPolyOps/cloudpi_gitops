@@ -107,7 +107,7 @@ argocd:
       podAntiAffinity: soft
   image:
     repository: docker.io
-      {.repository.quay}>
+      quay.io
   notifications:
     enabled: false
     webhook:
@@ -118,7 +118,7 @@ argocd:
   redis:
     image:
       repository: docker.io
-        {.repository.docker}>
+        docker.io
   redis-ha:
     enabled: true
     fullnameOverride: conf-dso-redis-ha
@@ -128,7 +128,7 @@ argocd:
           adaptSecurityContext: auto
     image:
       repository: docker.io
-        {.repository.docker}>/library/redis
+        docker.io/library/redis
       tag: 7.4.1-alpine
   repoServer:
     initContainers: null

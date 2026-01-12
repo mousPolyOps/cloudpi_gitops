@@ -17,13 +17,13 @@ awx:
       control_plane_ee_image: docker.io/ansible/awx-ee:24.6.1
       ee_images:
       - image: docker.io
-          {.repository.quay}>/ansible/awx-ee:24.6.1
+          quay.io/ansible/awx-ee:24.6.1
         name: AWX EE (24.6.1)
       extra_settings:
       - setting: CSRF_TRUSTED_ORIGINS
         value: '["https://awx.example.com"]'
       image: docker.io
-        {.repository.quay}>/ansible/awx
+        quay.io/ansible/awx
       image_version: 24.6.1
       ingress_annotations: '- {''route.openshift.io/termination'': ''edge''}
 
@@ -68,5 +68,5 @@ cpn-ansible-job:
       '
     image:
       repository: docker.io
-        {.repository.ghcr}>/cloud-pi-native/git-ansible
+        ghcr.io/cloud-pi-native/git-ansible
       tag: '1'

@@ -45,7 +45,7 @@ cpn-ansible-job:
       name: users-csv
     image:
       repository: docker.io
-        {.repository.ghcr}>/cloud-pi-native/git-ansible
+        ghcr.io/cloud-pi-native/git-ansible
       tag: '1'
 keycloak:
   args: []
@@ -95,7 +95,7 @@ keycloak:
   image:
     pullPolicy: IfNotPresent
     registry: docker.io
-      {.repository.docker}>
+      docker.io
     repository: bitnamilegacy/keycloak
   ingress:
     annotations:
@@ -142,7 +142,7 @@ keycloak:
     command:
     - sh
     image: docker.io
-      {.repository.docker}>/curlimages/curl:8.12.1
+      docker.io/curlimages/curl:8.12.1
     imagePullPolicy: IfNotPresent
     name: realm-ext-provider
     volumeMounts:

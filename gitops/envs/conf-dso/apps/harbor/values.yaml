@@ -1,8 +1,7 @@
 cluster:
   cluster:
     enablePDB: false
-    imageName: docker.io
-      {.repository.ghcr}>/cloudnative-pg/postgresql:16.2
+    imageName: ghcr.io/cloudnative-pg/postgresql:16.2
     initdb:
       database: registry
       owner: harbor
@@ -38,7 +37,7 @@ cpn-ansible-job:
         name: ansible-secret
     image:
       repository: docker.io
-        {.repository.ghcr}>/cloud-pi-native/git-ansible
+        ghcr.io/cloud-pi-native/git-ansible
       tag: '1'
 harbor:
   core:
@@ -55,7 +54,7 @@ harbor:
           weight: 100
     image:
       repository: docker.io
-        {.repository.docker}>/goharbor/harbor-core
+        docker.io/goharbor/harbor-core
     replicas: 3
     serviceAccountName: harbor-sa
   database:
@@ -83,7 +82,7 @@ harbor:
           weight: 100
     image:
       repository: docker.io
-        {.repository.docker}>/goharbor/harbor-exporter
+        docker.io/goharbor/harbor-exporter
     serviceAccountName: harbor-sa
   expose:
     imagePullPolicy: IfNotPresent
@@ -119,7 +118,7 @@ harbor:
           weight: 100
     image:
       repository: docker.io
-        {.repository.docker}>/goharbor/harbor-jobservice
+        docker.io/goharbor/harbor-jobservice
     jobLoggers:
     - stdout
     replicas: 2
@@ -131,7 +130,7 @@ harbor:
   nginx:
     image:
       repository: docker.io
-        {.repository.docker}>/goharbor/nginx-photon
+        docker.io/goharbor/nginx-photon
     replicas: 2
     serviceAccountName: harbor-sa
   persistence:
@@ -163,7 +162,7 @@ harbor:
           weight: 100
     image:
       repository: docker.io
-        {.repository.docker}>/goharbor/harbor-portal
+        docker.io/goharbor/harbor-portal
     replicas: 2
     serviceAccountName: harbor-sa
   redis:
@@ -216,6 +215,6 @@ harbor:
           weight: 100
     image:
       repository: docker.io
-        {.repository.docker}>/goharbor/trivy-adapter-photon
+        docker.io/goharbor/trivy-adapter-photon
     replicas: 2
     serviceAccountName: harbor-sa

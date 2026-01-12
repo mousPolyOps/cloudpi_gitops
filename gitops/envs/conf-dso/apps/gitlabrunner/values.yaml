@@ -13,7 +13,7 @@ gitlabrunner:
   gitlabUrl: https://docker.io/
   image:
     registry: docker.io
-      {.repository.gitlab}>
+      registry.gitlab.com
   rbac:
     create: true
     podSecurityPolicy:
