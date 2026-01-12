@@ -131,13 +131,7 @@ keycloak:
   initContainers:
   - args:
     - -c
-    - 'mkdir -p /emptydir/app-providers-dir && \
-
-      curl -k -fsSL -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar docker.io && \
-
-      curl -k -fsSL -o /emptydir/app-providers-dir/keycloak-franceconnect.jar docker.io
-
-      '
+    - 'mkdir -p /emptydir/app-providers-dir && touch /emptydir/app-providers-dir/keycloak-theme-dsfr.jar && touch /emptydir/app-providers-dir/keycloak-franceconnect.jar'
     command:
     - sh
     image: docker.io/curlimages/curl:8.12.1
