@@ -94,6 +94,8 @@ keycloak:
     value: admin
   - name: KC_HTTP_RELATIVE_PATH
     value: /
+  - name: KEYCLOAK_PRODUCTION
+    value: "false"
   - name: DSFR_THEME_HOME_URL
     value: https://keycloak.polyops.fr
   - name: DSFR_THEME_SERVICE_TITLE
