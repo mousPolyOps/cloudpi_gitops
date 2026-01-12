@@ -60,7 +60,6 @@ keycloak:
     enabled: true
     stackFile: ''
     stackName: kubernetes
-  command: []
   configuration: ''
   containerPorts:
     http: 8080
@@ -138,25 +137,6 @@ keycloak:
       pathType: Prefix
     extraRules: []
     hostname: keycloak.polyops.fr
-    extraEnvVars:
-    - name: KC_DB
-      value: postgres
-    - name: KC_HOSTNAME
-      value: keycloak.polyops.fr
-    - name: KC_HOSTNAME_STRICT
-      value: "false"
-    - name: KC_HTTP_RELATIVE_PATH
-      value: /
-    - name: KC_PROXY_HEADERS
-      value: xforwarded
-    - name: KC_HTTP_ENABLED
-      value: "true"
-    - name: KC_HEALTH_ENABLED
-      value: "true"
-    - name: KC_OPTIMIZED
-      value: "false"
-    - name: KC_LOG_LEVEL
-      value: DEBUG
     ingressClassName: traefik
     labels:
       app: keycloak
