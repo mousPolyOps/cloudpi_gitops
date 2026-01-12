@@ -1,7 +1,7 @@
 cluster:
   cluster:
     enablePDB: false
-    imageName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+    imageName: docker.io
       {.repository.ghcr}>/cloudnative-pg/postgresql:16.2
     initdb:
       database: registry
@@ -37,7 +37,7 @@ cpn-ansible-job:
     - secretRef:
         name: ansible-secret
     image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.ghcr}>/cloud-pi-native/git-ansible
       tag: '1'
 harbor:
@@ -54,7 +54,7 @@ harbor:
             topologyKey: kubernetes.io/hostname
           weight: 100
     image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.docker}>/goharbor/harbor-core
     replicas: 3
     serviceAccountName: harbor-sa
@@ -67,8 +67,7 @@ harbor:
       username: harbor
     internal:
       image:
-        repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image |
-          jsonPath {.repository.docker}>/goharbor/harbor-db
+        repository: docker.io/goharbor/harbor-db
     type: external
   exporter:
     affinity:
@@ -83,7 +82,7 @@ harbor:
             topologyKey: kubernetes.io/hostname
           weight: 100
     image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.docker}>/goharbor/harbor-exporter
     serviceAccountName: harbor-sa
   expose:
@@ -91,12 +90,10 @@ harbor:
     ingress:
       annotations:
         route.openshift.io/termination: edge
-      className: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+      className: docker.io
       hosts:
-        core: <path:dso-sandbox/data/env/conf-dso/apps/global/values#domain | jsonPath
-          {.harbor}>
-        notary: <path:dso-sandbox/data/env/conf-dso/apps/global/values#domain | jsonPath
-          {.harborNotary}>
+        core: docker.io
+        notary: docker.io
       labels: null
       notary:
         annotations:
@@ -105,26 +102,7 @@ harbor:
     tls:
       enabled: false
     type: ingress
-  externalURL: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain
-    | jsonPath {.harbor}>
-  fullnameOverride: harbor
-  harborAdminPassword: <path:dso-sandbox/data/env/conf-dso/apps/harbor/values#global
-    | jsonPath {.harborAdminPassword}>
-  jobservice:
-    affinity:
-      podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-        - podAffinityTerm:
-            labelSelector:
-              matchLabels:
-                app.kubernetes.io/component: jobservice
-                app.kubernetes.io/instance: sandbox-dso-harbor
-                app.kubernetes.io/name: harbor
-            topologyKey: kubernetes.io/hostname
-          weight: 100
-    image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
-        {.repository.docker}>/goharbor/harbor-jobservice
+  externalURL: https://docker.io/goharbor/harbor-jobservice
     jobLoggers:
     - stdout
     replicas: 2
@@ -135,7 +113,7 @@ harbor:
       enabled: false
   nginx:
     image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.docker}>/goharbor/nginx-photon
     replicas: 2
     serviceAccountName: harbor-sa
@@ -167,7 +145,7 @@ harbor:
             topologyKey: kubernetes.io/hostname
           weight: 100
     image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.docker}>/goharbor/harbor-portal
     replicas: 2
     serviceAccountName: harbor-sa
@@ -185,8 +163,7 @@ harbor:
               topologyKey: kubernetes.io/hostname
             weight: 100
       image:
-        repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image |
-          jsonPath {.repository.docker}>/goharbor/redis-photon
+        repository: docker.io/goharbor/redis-photon
       serviceAccountName: harbor-sa
   registry:
     affinity:
@@ -202,12 +179,10 @@ harbor:
           weight: 100
     controller:
       image:
-        repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image |
-          jsonPath {.repository.docker}>/goharbor/harbor-registryctl
+        repository: docker.io/goharbor/harbor-registryctl
     registry:
       image:
-        repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image |
-          jsonPath {.repository.docker}>/goharbor/registry-photon
+        repository: docker.io/goharbor/registry-photon
     replicas: 3
     serviceAccountName: harbor-sa
   trivy:
@@ -223,7 +198,7 @@ harbor:
             topologyKey: kubernetes.io/hostname
           weight: 100
     image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.docker}>/goharbor/trivy-adapter-photon
     replicas: 2
     serviceAccountName: harbor-sa

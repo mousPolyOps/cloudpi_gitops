@@ -12,16 +12,15 @@ glexporter:
         weight: 100
   config:
     gitlab:
-      token: <path:dso-sandbox/data/env/conf-dso/apps/gitlab/values#gitlabToken>
-      url: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain |
-        jsonPath {.gitlab}>/
+      token: docker.io
+      url: https://docker.io/
     redis:
       url: redis://glexporter-redis-master.dso-gitlab.svc:6379
     wildcards:
     - {}
   fullnameOverride: glexporter
   image:
-    repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+    repository: docker.io
       {.repository.quay}>/mvisonneau/gitlab-ci-pipelines-exporter
   redis:
     fullnameOverride: glexporter-redis
@@ -29,15 +28,4 @@ glexporter:
       compatibility:
         openshift:
           adaptSecurityContext: force
-      imageRegistry: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
-        | jsonPath {.repository.docker}>
-    image:
-      repository: bitnamilegacy/redis
-    master:
-      podAntiAffinityPreset: soft
-  serviceMonitor:
-    enabled: true
-    endpoints:
-    - interval: 30s
-      path: /metrics
-      port: http
+      imageRegistry: docker.io

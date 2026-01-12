@@ -6,8 +6,7 @@ awx:
       dbName: awx
       enabled: true
       host: pg-cluster-awx-rw
-      password: <path:dso-sandbox/data/env/conf-dso/apps/awx/values#auth | jsonPath
-        {.adminPassword}>
+      password: docker.io
       port: 5432
       sslmode: prefer
       type: unmanaged
@@ -15,31 +14,22 @@ awx:
     rbac:
       create: true
     spec:
-      control_plane_ee_image: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
-        | jsonPath {.repository.quay}>/ansible/awx-ee:24.6.1
-      ee_images:
-      - image: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
-          {.repository.quay}>/ansible/awx-ee:24.6.1
+      control_plane_ee_image: docker.io/ansible/awx-ee:24.6.1
         name: AWX EE (24.6.1)
       extra_settings:
       - setting: CSRF_TRUSTED_ORIGINS
         value: '["https://awx.example.com"]'
-      image: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      image: docker.io
         {.repository.quay}>/ansible/awx
       image_version: 24.6.1
       ingress_annotations: '- {''route.openshift.io/termination'': ''edge''}
 
         '
-      ingress_class_name: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+      ingress_class_name: docker.io
       ingress_hosts:
-      - hostname: <path:dso-sandbox/data/env/conf-dso/apps/global/values#domain |
-          jsonPath {.awx}>
+      - hostname: docker.io
       ingress_type: ingress
-      init_container_image: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
-        | jsonPath {.repository.quay}>/ansible/awx-ee
-      init_container_image_version: 24.6.1
-      redis_image: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image |
-        jsonPath {.repository.quay}>/redis
+      init_container_image: docker.io/redis
       redis_image_version: '7'
       service_type: ClusterIP
 cluster:
@@ -72,6 +62,6 @@ cpn-ansible-job:
 
       '
     image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.ghcr}>/cloud-pi-native/git-ansible
       tag: '1'

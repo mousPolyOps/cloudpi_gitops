@@ -20,27 +20,26 @@ cpn-ansible-job:
     - secretRef:
         name: ansible-secret
     image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.ghcr}>/cloud-pi-native/git-ansible
       tag: '1'
 vault:
   csi:
     agent:
       image:
-        repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image |
-          jsonPath {.repository.docker}>/hashicorp/vault
+        repository: docker.io/hashicorp/vault
     image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.docker}>/hashicorp/vault-csi-provider
   fullnameOverride: conf-dso-vault
   global:
     openshift: true
   injector:
     agentImage:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.docker}>/hashicorp/vault
     image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.docker}>/hashicorp/vault-k8s
   server:
     auditStorage:
@@ -49,15 +48,7 @@ vault:
       enable: true
       size: 23Gi
     ha:
-      apiAddr: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain
-        | jsonPath {.vault}>
-      enabled: true
-      raft:
-        enabled: true
-      replicas: 3
-    image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
-        {.repository.docker}>/hashicorp/vault
+      apiAddr: https://docker.io/hashicorp/vault
     route:
       enabled: false
     standalone:

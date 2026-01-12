@@ -4,7 +4,7 @@ argocd:
     replicas: 2
     webhook:
       ingress:
-        ingressClassName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+        ingressClassName: docker.io
   configs:
 # BEGIN ANSIBLE MANAGED BLOCK: rbac
     rbac:
@@ -74,17 +74,10 @@ argocd:
         return hs
       # We need this to be last so rootCA_block will be a sublevel of oidc.config
       oidc.config: |
-        issuer: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain | jsonPath {.keycloak}>/realms/dso
+        issuer: https://keycloak.polyops.fr/realms/dso
         requestedScopes: ["openid", "generic"]
         name: Keycloak
-        clientID: <path:dso-sandbox/data/env/conf-dso/apps/keycloak/values#client | jsonPath {.argo.id}>
-        clientSecret: <path:dso-sandbox/data/env/conf-dso/apps/keycloak/values#client | jsonPath {.argo.secret}>
-# END ANSIBLE MANAGED BLOCK: resource.exclusions, oidc.config and resource.customizations
-      admin.enabled: 'false'
-      clusterResources: 'true'
-      kustomize.buildOptions: --enable-helm
-      url: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain |
-        jsonPath {.argocd}>
+        clientID: docker.io
       users.anonymous.enabled: 'false'
     params:
       server.insecure: true
@@ -107,18 +100,18 @@ argocd:
     affinity:
       podAntiAffinity: soft
   image:
-    repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+    repository: docker.io
       {.repository.quay}>
   notifications:
     enabled: false
     webhook:
       ingress:
-        ingressClassName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+        ingressClassName: docker.io
   openshift:
     enabled: true
   redis:
     image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.docker}>
   redis-ha:
     enabled: true
@@ -128,7 +121,7 @@ argocd:
         openshift:
           adaptSecurityContext: auto
     image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.docker}>/library/redis
       tag: 7.4.1-alpine
   repoServer:
@@ -136,7 +129,7 @@ argocd:
     replicas: 3
   server:
     ingress:
-      ingressClassName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+      ingressClassName: docker.io
     ingressGrpc:
-      ingressClassName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+      ingressClassName: docker.io
     replicas: 3

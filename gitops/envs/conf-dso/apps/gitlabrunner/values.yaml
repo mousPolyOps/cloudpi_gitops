@@ -10,11 +10,7 @@ gitlabrunner:
           topologyKey: kubernetes.io/hostname
         weight: 100
   fullnameOverride: gitlab-runner
-  gitlabUrl: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain
-    | jsonPath {.gitlab}>/
-  image:
-    registry: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
-      {.repository.gitlab}>
+  gitlabUrl: https://docker.io
   rbac:
     create: true
     podSecurityPolicy:
@@ -51,7 +47,7 @@ gitlabrunner:
     requests:
       ephemeral-storage: 500Mi
   revisionHistoryLimit: 2
-  runnerToken: <path:dso-sandbox/data/env/conf-dso/apps/gitlab/values#runnerToken>
+  runnerToken: docker.io
   runners:
     config: "[[runners]]\n  [runners.kubernetes]\n    namespace = \"dso-gitlab\"\n
       \   image = \"ubuntu:22.04\"\n    # multiple \"always\" to retry pull on fail

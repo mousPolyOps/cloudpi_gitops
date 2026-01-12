@@ -1,7 +1,7 @@
 cluster:
   cluster:
     enablePDB: false
-    imageName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+    imageName: docker.io
       {.repository.ghcr}>/cloudnative-pg/postgresql:16.2
     initdb:
       database: sonardb
@@ -37,7 +37,7 @@ cpn-ansible-job:
     - secretRef:
         name: ansible-secret
     image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.ghcr}>/cloud-pi-native/git-ansible
       tag: '1'
 sonarqube:
@@ -68,24 +68,17 @@ sonarqube:
   containerSecurityContext:
     runAsGroup: null
     runAsUser: null
-  curlContainerImage: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image
-    | jsonPath {.repository.docker}>/curlimages/curl:8.11.0
-  fullnameOverride: sonarqube-sonarqube
-  image:
-    pullPolicy: IfNotPresent
-    repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
-      {.repository.docker}>/sonarqube
+  curlContainerImage: docker.io/sonarqube
   ingress:
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: 64m
       route.openshift.io/termination: edge
     enabled: true
     hosts:
-    - name: <path:dso-sandbox/data/env/conf-dso/apps/global/values#domain | jsonPath
-        {.sonarqube}>
+    - name: docker.io
       path: /
       pathType: Prefix
-    ingressClassName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+    ingressClassName: docker.io
     labels:
       app: sonar
   initContainers:
@@ -126,21 +119,4 @@ sonarqube:
   sonarProperties:
     sonar.auth.oidc.allowUsersToSignUp: 'true'
     sonar.auth.oidc.autoLogin: 'false'
-    sonar.auth.oidc.clientId.secured: <path:dso-sandbox/data/env/conf-dso/apps/keycloak/values#client
-      | jsonPath {.sonar.id}>
-    sonar.auth.oidc.clientSecret.secured: <path:dso-sandbox/data/env/conf-dso/apps/keycloak/values#client
-      | jsonPath {.sonar.secret}>
-    sonar.auth.oidc.enabled: 'true'
-    sonar.auth.oidc.groupsSync: 'true'
-    sonar.auth.oidc.groupsSync.claimName: groups
-    sonar.auth.oidc.issuerUri: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain
-      | jsonPath {.keycloak}>/realms/dso
-    sonar.auth.oidc.loginStrategy: Email
-    sonar.auth.oidc.loginStrategy.customClaim.name: upn
-    sonar.auth.oidc.scopes: openid generic
-    sonar.core.serverBaseURL: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain
-      | jsonPath {.sonarqube}>
-    sonar.plugins.risk.consent: ACCEPTED
-  sonarWebContext: /
-  sonarqubeFolder: /opt/sonarqube
-  terminationGracePeriodSeconds: 60
+    sonar.auth.oidc.clientId.secured: docker.io

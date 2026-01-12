@@ -9,15 +9,6 @@ metadata:
   labels:
     app: nexus
 spec:
-  ingressClassName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+  ingressClassName: docker.io
   rules:
-    - host: <path:dso-sandbox/data/env/conf-dso/apps/global/values#domain | jsonPath {.nexusDockerProxy}>
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: nexus
-                port:
-                  name: dockerproxy
+    - host: docker.io

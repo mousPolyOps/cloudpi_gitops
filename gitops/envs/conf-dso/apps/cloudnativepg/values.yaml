@@ -14,7 +14,7 @@ cloudnativepg:
     runAsUser: 1000957777
   fullnameOverride: cloudnative-pg
   image:
-    registry: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+    registry: docker.io
       {.repository.ghcr}>/cloudnative-pg/cloudnative-pg
   nameOverride: cloudnative-pg
   replicaCount: 3

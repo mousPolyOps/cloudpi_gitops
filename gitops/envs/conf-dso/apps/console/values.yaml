@@ -1,7 +1,7 @@
 cluster:
   cluster:
     enablePDB: false
-    imageName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+    imageName: docker.io
       {.repository.ghcr}>/cloudnative-pg/postgresql:16.2
     initdb:
       database: dso-console-db
@@ -41,7 +41,7 @@ console:
       port: 8080
     healthcheckPath: /
     image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.ghcr}>/cloud-pi-native/console/client
     livenessProbe:
       enabled: true
@@ -83,39 +83,29 @@ console:
     projectsRootDir: forge
     secrets:
       ARGOCD_INTERNAL_URL: http://conf-dso-argocd-server.dso-argocd.svc.cluster.local
-      ARGOCD_URL: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain|
-        jsonPath {.argocd}>/
+      ARGOCD_URL: https://docker.io/
       ARGO_NAMESPACE: dso-argocd
       GITLAB_INTERNAL_URL: http://gitlab-webservice-default.dso-gitlab.svc.cluster.local:8181/
-      GITLAB_TOKEN: <path:dso-sandbox/data/env/conf-dso/apps/gitlab/values#gitlabToken>
-      GITLAB_URL: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain|
-        jsonPath {.gitlab}>/
+      GITLAB_TOKEN: docker.io
+      GITLAB_URL: https://docker.io/
       HARBOR_ADMIN: admin
-      HARBOR_ADMIN_PASSWORD: <path:dso-sandbox/data/env/conf-dso/apps/harbor/values#global|
-        jsonPath {.harborAdminPassword}>
+      HARBOR_ADMIN_PASSWORD: docker.io
       HARBOR_INTERNAL_URL: http://harbor-core.dso-harbor.svc.cluster.local/
       HARBOR_RULE_COUNT: '100'
-      HARBOR_URL: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain|
-        jsonPath {.harbor}>/
+      HARBOR_URL: https://docker.io/
       KEYCLOAK_ADMIN: dsoadmin
-      KEYCLOAK_ADMIN_PASSWORD: <path:dso-sandbox/data/env/conf-dso/apps/keycloak/values#auth|
-        jsonPath {.adminPassword}>
+      KEYCLOAK_ADMIN_PASSWORD: docker.io
       KEYCLOAK_URL: http://keycloak.dso-keycloak.svc.cluster.local/realms/dso/.well-known/openid-configuration
       NEXUS_ADMIN: admin
-      NEXUS_ADMIN_PASSWORD: <path:dso-sandbox/data/env/conf-dso/apps/nexus/values#auth|
-        jsonPath {.adminPassword}>
+      NEXUS_ADMIN_PASSWORD: docker.io
       NEXUS_INTERNAL_URL: http://nexus.dso-nexus.svc.cluster.local:8081/
-      NEXUS_URL: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain|
-        jsonPath {.nexus}>/
+      NEXUS_URL: https://docker.io/
       SONARQUBE_INTERNAL_URL: http://sonarqube-sonarqube.dso-sonarqube.svc.cluster.local:9000/
-      SONARQUBE_URL: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain|
-        jsonPath {.sonarqube}>/
-      SONAR_API_TOKEN: <path:dso-sandbox/data/env/conf-dso/apps/sonarqube/values#auth|
-        jsonPath {.sonarApiToken}>
+      SONARQUBE_URL: https://docker.io/
+      SONAR_API_TOKEN: docker.io
       VAULT_INTERNAL_URL: http://conf-dso-vault-active.dso-vault.svc.cluster.local:8200/
-      VAULT_TOKEN: <path:dso-sandbox/data/env/conf-dso/apps/vault/values#vaultToken>
-      VAULT_URL: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain|
-        jsonPath {.vault}>/
+      VAULT_TOKEN: docker.io
+      VAULT_URL: https://docker.io/
   fullnameOverride: dso-cpn-console
   global:
     env:
@@ -125,35 +115,26 @@ console:
         backend: console-backend
         frontend: console-frontend
       clientSecrets:
-        backend: <path:dso-sandbox/data/env/conf-dso/apps/keycloak/values#client|
-          jsonPath {.consoleBackend.secret}>
+        backend: docker.io
       devRealm: false
       domain:
         backend: keycloak.dso-keycloak.svc.cluster.local
-        frontend: <path:dso-sandbox/data/env/conf-dso/apps/global/values#domain| jsonPath
-          {.keycloak}>
+        frontend: docker.io
       protocol:
         backend: http
         frontend: https
       realm: dso
-      redirectUri: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain|
-        jsonPath {.console}>
+      redirectUri: https://docker.io
       sessionSecret: a-very-strong-secret-with-more-than-32-char
     postgresql:
       cnpgSecretName: pg-cluster-console-app
   ingress:
     annotations:
       route.openshift.io/termination: edge
-    className: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+    className: docker.io
     enabled: true
     hosts:
-    - <path:dso-sandbox/data/env/conf-dso/apps/global/values#domain| jsonPath {.console}>
-    labels: {}
-  nameOverride: conf-dso-cpn-console
-  postgres:
-    image:
-      registry: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
-        {.repository.ghcr}>
+    - docker.io
       repository: postgres:15.3
   postgresql:
     architecture: standalone
@@ -188,7 +169,7 @@ console:
       name: ''
     healthcheckPath: /api/v1/healthz
     image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.ghcr}>/cloud-pi-native/console/server
     livenessProbe:
       enabled: true

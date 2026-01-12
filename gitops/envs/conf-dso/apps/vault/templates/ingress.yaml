@@ -9,9 +9,9 @@ metadata:
   labels:
     app: vault
 spec:
-  ingressClassName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+  ingressClassName: docker.io
   rules:
-    - host: <path:dso-sandbox/data/env/conf-dso/apps/global/values#domain | jsonPath {.vault}>
+    - host: vault.infra.polyops.fr
       http:
         paths:
           - path: /

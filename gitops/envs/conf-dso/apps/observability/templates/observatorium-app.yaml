@@ -19,7 +19,7 @@ spec:
       - ./values.yaml
       - $tenants/helm/values.yaml
   - ref: tenants
-    repoURL: "https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain | jsonPath {.gitlab}>/observability/observability.git"
+    repoURL: "https://gitlab.polyops.fr/observability/observability.git"
     targetRevision: main
   syncPolicy:
     automated:

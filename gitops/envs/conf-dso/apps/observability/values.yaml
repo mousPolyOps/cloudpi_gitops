@@ -21,8 +21,7 @@ grafana:
           path: roles/gitops/rendering-apps-files/templates/dashboard
           url: https://github.com/cloud-pi-native/socle.git
   grafana:
-    adminPassword: <path:dso-sandbox/data/env/conf-dso/apps/observability/values#grafana|
-      jsonPath {.adminPassword}>
+    adminPassword: docker.io
     isOpenShift: true
     observatorium_url: http://sandbox-dso-observatorium-api.dso-observatorium.svc.cluster.local:8080
   grafana-operator:
@@ -43,19 +42,15 @@ grafana:
     aud: grafana
     enabled: true
     groups_attribute_path: group
-    id: <path:dso-sandbox/data/env/conf-dso/apps/keycloak/values#client | jsonPath
-      {.grafana.id}>
+    id: docker.io
     scopes: profile, email, openid, group
-    secret: <path:dso-sandbox/data/env/conf-dso/apps/keycloak/values#client | jsonPath
-      {.grafana.secret}>
-    url: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain | jsonPath
-      {.keycloak}>/realms/dso
+    secret: docker.io
+    url: https://docker.io/realms/dso
   server:
     certManager:
       enabled: true
-    ingressClassName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
-    url: <path:dso-sandbox/data/env/conf-dso/apps/global/values#domain | jsonPath
-      {.grafana}>
+    ingressClassName: docker.io
+    url: docker.io
 observatorium:
   affinity:
     podAntiAffinity:
@@ -75,59 +70,4 @@ observatorium:
       groups:
       - /admin
       id: prod-infra
-      issuerURL: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain
-        | jsonPath {.keycloak}>/realms/dso
-      name: prod-infra
-      usernameClaim: preferred_username
-    loglevel: info
-  global:
-    projects:
-      console:
-        envs:
-          hprod:
-            groups:
-            - /admin
-            - /admin
-            tenants:
-              hprod-dso: {}
-          prod:
-            groups:
-            - /admin
-            - /admin
-            tenants:
-              prod-dso: {}
-        projectName: dso
-        projectRepository:
-          path: roles/gitops/rendering-apps-files/templates/dashboard
-          url: https://github.com/cloud-pi-native/socle.git
-  ingress:
-    enabled: false
-  logs:
-    enabled: false
-    read:
-      endpoint: <path:dso-sandbox/data/env/conf-dso/apps/observability/values#endpoint
-        | jsonPath {.logs}>
-    rules:
-      endpoint: <path:dso-sandbox/data/env/conf-dso/apps/observability/values#endpoint
-        | jsonPath {.logs}>
-    tail:
-      endpoint: <path:dso-sandbox/data/env/conf-dso/apps/observability/values#endpoint
-        | jsonPath {.logs}>
-    write:
-      endpoint: <path:dso-sandbox/data/env/conf-dso/apps/observability/values#endpoint
-        | jsonPath {.logs}>
-  metrics:
-    alertmanager:
-      endpoint: <path:dso-sandbox/data/env/conf-dso/apps/observability/values#endpoint
-        | jsonPath {.metrics}>
-    enabled: false
-    read:
-      endpoint: <path:dso-sandbox/data/env/conf-dso/apps/observability/values#endpoint
-        | jsonPath {.metrics}>
-    rules:
-      endpoint: <path:dso-sandbox/data/env/conf-dso/apps/observability/values#endpoint
-        | jsonPath {.metrics}>
-    tenantHeader: X-Scope-OrgId
-    write:
-      endpoint: <path:dso-sandbox/data/env/conf-dso/apps/observability/values#endpoint
-        | jsonPath {.metrics}>
+      issuerURL: https://docker.io

@@ -1,7 +1,7 @@
 cluster:
   cluster:
     enablePDB: false
-    imageName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+    imageName: docker.io
       {.repository.ghcr}>/cloudnative-pg/postgresql:16.2
     initdb:
       database: keycloak
@@ -45,7 +45,7 @@ cpn-ansible-job:
         name: keycloak-users
       name: users-csv
     image:
-      repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+      repository: docker.io
         {.repository.ghcr}>/cloud-pi-native/git-ansible
       tag: '1'
 keycloak:
@@ -78,8 +78,7 @@ keycloak:
     port: 5432
   extraEnvVars:
   - name: DSFR_THEME_HOME_URL
-    value: https://<path:dso-sandbox/data/env/conf-dso/apps/global/values#domain |
-      jsonPath {.console}>
+    value: https://docker.io
   - name: DSFR_THEME_SERVICE_TITLE
     value: Cloud Pi Native
   - name: DSFR_THEME_BRAND_TOP
@@ -96,7 +95,7 @@ keycloak:
   httpRelativePath: /
   image:
     pullPolicy: IfNotPresent
-    registry: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
+    registry: docker.io
       {.repository.docker}>
     repository: bitnamilegacy/keycloak
   ingress:
@@ -121,9 +120,8 @@ keycloak:
       path: /realms/master/
       pathType: Prefix
     extraRules: []
-    hostname: <path:dso-sandbox/data/env/conf-dso/apps/global/values#domain | jsonPath
-      {.keycloak}>
-    ingressClassName: <path:dso-sandbox/data/env/conf-dso/apps/global/values#ingressClassName>
+    hostname: docker.io
+    ingressClassName: docker.io
     labels:
       app: keycloak
     path: /
@@ -137,17 +135,7 @@ keycloak:
     - -c
     - 'mkdir -p /emptydir/app-providers-dir && \
 
-      curl -k -fsSL -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar <path:dso-sandbox/data/env/conf-dso/apps/keycloak/values#initcontainers
-      | jsonPath {.pluginDownloadUrl}> && \
-
-      curl -k -fsSL -o /emptydir/app-providers-dir/keycloak-franceconnect.jar <path:dso-sandbox/data/env/conf-dso/apps/keycloak/values#initcontainers
-      | jsonPath {.providerDownloadUrl}>
-
-      '
-    command:
-    - sh
-    image: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image | jsonPath
-      {.repository.docker}>/curlimages/curl:8.12.1
+      curl -k -fsSL -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar docker.io/curlimages/curl:8.12.1
     imagePullPolicy: IfNotPresent
     name: realm-ext-provider
     volumeMounts:

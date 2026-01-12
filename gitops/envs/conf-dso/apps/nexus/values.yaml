@@ -39,8 +39,7 @@ nexus3:
         argocd.argoproj.io/hook-delete-policy: HookSucceeded
       image:
         pullPolicy: IfNotPresent
-        repository: <path:dso-sandbox/data/env/conf-dso/apps/global/values#image |
-          jsonPath {.repository.docker}>/alpine/k8s
+        repository: docker.io/alpine/k8s
         tag: 1.31.2
       podSecurityContext: false
       securityContext: false
@@ -112,8 +111,4 @@ nexus3:
     additionalPorts:
     - containerPort: 5000
       hosts:
-      - <path:dso-sandbox/data/env/conf-dso/apps/global/values#domain | jsonPath {.nexusDockerProxy}>
-      name: dockerproxy
-      port: 5000
-    port: 8081
-    type: ClusterIP
+      - docker.io
