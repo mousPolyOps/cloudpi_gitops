@@ -4,7 +4,7 @@ argocd:
     replicas: 2
     webhook:
       ingress:
-        ingressClassName: docker.io
+        ingressClassName: traefik
   configs:
 # BEGIN ANSIBLE MANAGED BLOCK: rbac
     rbac:
@@ -106,7 +106,7 @@ argocd:
     enabled: false
     webhook:
       ingress:
-        ingressClassName: docker.io
+        ingressClassName: traefik
   openshift:
     enabled: true
   redis:
@@ -129,7 +129,7 @@ argocd:
     replicas: 3
   server:
     ingress:
-      ingressClassName: docker.io
+      ingressClassName: traefik
     ingressGrpc:
-      ingressClassName: docker.io
+      ingressClassName: traefik
     replicas: 3

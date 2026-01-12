@@ -78,7 +78,7 @@ sonarqube:
     - name: docker.io
       path: /
       pathType: Prefix
-    ingressClassName: docker.io
+    ingressClassName: traefik
     labels:
       app: sonar
   initContainers:

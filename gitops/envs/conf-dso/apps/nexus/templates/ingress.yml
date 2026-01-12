@@ -9,6 +9,6 @@ metadata:
   labels:
     app: nexus
 spec:
-  ingressClassName: docker.io
+  ingressClassName: traefik
   rules:
     - host: docker.io

@@ -49,7 +49,7 @@ grafana:
   server:
     certManager:
       enabled: true
-    ingressClassName: docker.io
+    ingressClassName: traefik
     url: docker.io
 observatorium:
   affinity:

@@ -8,6 +8,6 @@ metadata:
     route.openshift.io/termination: edge
   labels:
 spec:
-  ingressClassName: docker.io
+  ingressClassName: traefik
   rules:
     - host: docker.io

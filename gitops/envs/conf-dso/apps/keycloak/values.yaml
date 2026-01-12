@@ -121,7 +121,7 @@ keycloak:
       pathType: Prefix
     extraRules: []
     hostname: docker.io
-    ingressClassName: docker.io
+    ingressClassName: traefik
     labels:
       app: keycloak
     path: /

@@ -9,7 +9,7 @@ metadata:
   labels:
     app: vault
 spec:
-  ingressClassName: docker.io
+  ingressClassName: traefik
   rules:
     - host: vault.infra.polyops.fr
       http:
