@@ -79,6 +79,8 @@ keycloak:
   extraEnvVars:
   - name: KC_DB
     value: postgres
+  - name: KC_OPTIMIZED
+    value: "false"
   - name: KC_LOG_LEVEL
     value: DEBUG
   - name: KC_HOSTNAME
@@ -149,6 +151,8 @@ keycloak:
       value: "true"
     - name: KC_HEALTH_ENABLED
       value: "true"
+    - name: KC_OPTIMIZED
+      value: "false"
     - name: KC_LOG_LEVEL
       value: DEBUG
     ingressClassName: traefik
