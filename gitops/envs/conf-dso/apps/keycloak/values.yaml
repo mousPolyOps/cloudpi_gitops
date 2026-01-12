@@ -19,25 +19,20 @@ cluster:
       size: 10Gi
   fullnameOverride: pg-cluster-keycloak
   nameOverride: pg-cluster-keycloak
+
 cpn-ansible-job:
   global:
-    platform: openshift
+    platform: kubernetes
   job:
     command:
     - /bin/sh
     - -c
-    - 'git clone https://github.com/cloud-pi-native/socle.git && \
-
-      cd socle && \
-
-      ansible-playbook post-install/keycloak.yaml
-
-      '
+    - echo "Keycloak users configuration job"
     extraEnvFrom:
-    - secretRef:
-        name: ansible-secret
+    - configMapRef:
+        name: keycloak-users
     extraVolumeMounts:
-    - mountPath: /config
+    - mountPath: /data
       name: users-csv
       readOnly: true
     extraVolumes:
@@ -47,203 +42,112 @@ cpn-ansible-job:
     image:
       repository: ghcr.io/cloud-pi-native/git-ansible
       tag: '1'
+
 keycloak:
-  auth:
-    adminUser: admin
-    existingSecret: keycloak
-    passwordSecretKey: admin-password
-  autoscaling:
-    enabled: false
-  cache:
-    enabled: true
-    stackFile: ''
-    stackName: kubernetes
-  args:
-    - start-dev
-  configuration: ''
-  containerPorts:
-    http: 8080
-    https: 8443
-    infinispan: 7800
-  containerSecurityContext:
-    enabled: false
-  existingConfigmap: ''
-  externalDatabase:
-    database: keycloak
-    existingSecret: pg-cluster-keycloak-app
-    existingSecretPasswordKey: password
-    existingSecretUserKey: username
-    host: pg-cluster-keycloak-rw
-    port: 5432
-  extraEnvVars:
-  - name: KC_DB
-    value: postgres
-  - name: KC_OPTIMIZED
-    value: "false"
-  - name: KC_LOG_LEVEL
-    value: DEBUG
-  - name: KC_HOSTNAME
-    value: keycloak.polyops.fr
-  - name: KC_HOSTNAME_STRICT
-    value: "false"
-  - name: KC_PROXY_HEADERS
-    value: xforwarded
-  - name: KC_HTTP_ENABLED
-    value: "true"
-  - name: KC_BOOTSTRAP_ADMIN_USERNAME
-    value: admin
-  - name: KC_HTTP_RELATIVE_PATH
-    value: /
-  - name: KEYCLOAK_PRODUCTION
-    value: "false"
-  - name: DSFR_THEME_HOME_URL
-    value: https://keycloak.polyops.fr
-  - name: DSFR_THEME_SERVICE_TITLE
-    value: Cloud Pi Native
-  - name: DSFR_THEME_BRAND_TOP
-    value: Ministere<br/>de l'interieur
-  - name: DSFR_THEME_CONTACT_EMAIL
-    value: cloudpinative-relations@interieur.gouv.fr
-  extraEnvVarsCM: ''
-  extraEnvVarsSecret: ''
-  extraStartupArgs: ''
-  fullnameOverride: keycloak
-  global:
-    imageRegistry: docker.io
-    security:
-      allowInsecureImages: true
-  httpRelativePath: /
+  replicas: 1
+  
   image:
-    pullPolicy: IfNotPresent
-    registry: quay.io
-    repository: keycloak/keycloak
+    repository: quay.io/keycloak/keycloak
     tag: "26.0.7"
+    pullPolicy: IfNotPresent
+  
+  command:
+    - "/opt/keycloak/bin/kc.sh"
+  
+  args:
+    - "start"
+    - "--optimized"
+  
+  extraEnv: |
+    - name: KC_DB
+      value: postgres
+    - name: KC_DB_URL_HOST
+      value: pg-cluster-keycloak-rw
+    - name: KC_DB_URL_DATABASE
+      value: keycloak
+    - name: KC_DB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: pg-cluster-keycloak-app
+          key: username
+    - name: KC_DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: pg-cluster-keycloak-app
+          key: password
+    - name: KC_HOSTNAME
+      value: keycloak.polyops.fr
+    - name: KC_HOSTNAME_STRICT
+      value: "false"
+    - name: KC_PROXY_HEADERS
+      value: xforwarded
+    - name: KC_HTTP_ENABLED
+      value: "true"
+    - name: KC_HEALTH_ENABLED
+      value: "true"
+    - name: KEYCLOAK_ADMIN
+      value: admin
+    - name: KEYCLOAK_ADMIN_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: keycloak
+          key: admin-password
+    - name: JAVA_OPTS_APPEND
+      value: "-Djgroups.dns.query=keycloak-headless"
+  
   ingress:
-    annotations:
-      route.openshift.io/termination: edge
-    apiVersion: ''
+    enabled: false
+  
+  service:
+    type: ClusterIP
+    httpPort: 8080
+  
+  serviceHeadless:
     enabled: true
-    extraHosts: []
-    extraPaths:
-    - backend:
-        service:
-          name: forbidden
-          port:
-            name: http
-      path: /admin/
-      pathType: Prefix
-    - backend:
-        service:
-          name: forbidden
-          port:
-            name: http
-      path: /realms/master/
-      pathType: Prefix
-    extraRules: []
-    hostname: keycloak.polyops.fr
-    ingressClassName: traefik
-    labels:
-      app: keycloak
-    path: /
-    pathType: Prefix
-    secrets: []
-    selfSigned: false
-    servicePort: http
-    tls: true
-  initContainers:
-  - args:
-    - -c
-    - 'mkdir -p /emptydir/app-providers-dir && chmod 777 /emptydir/app-providers-dir && touch /emptydir/app-providers-dir/keycloak-theme-dsfr.jar && touch /emptydir/app-providers-dir/keycloak-franceconnect.jar'
-    command:
-    - sh
-    image: docker.io/curlimages/curl:8.12.1
-    imagePullPolicy: IfNotPresent
-    name: realm-ext-provider
-    securityContext:
-      runAsUser: 0
-    volumeMounts:
-    - mountPath: /emptydir
-      name: empty-dir
-  initdbScriptsConfigMap: ''
-  keycloakConfigCli:
-    enabled: false
-  livenessProbe:
-    enabled: true
-    failureThreshold: 3
-    initialDelaySeconds: 300
-    periodSeconds: 1
-    successThreshold: 1
-    timeoutSeconds: 5
-  logging:
-    level: INFO
-    output: default
-  metrics:
-    enabled: false
-    serviceMonitor:
-      enabled: false
-  networkPolicy:
-    additionalRules: {}
-    allowExternal: true
-    enabled: false
-  pdb:
-    create: false
-  podAntiAffinityPreset: soft
-  podSecurityContext:
-    enabled: false
-  postgresql:
-    enabled: false
-  production: false
-  proxyHeaders: xforwarded
-  rbac:
-    create: false
-    rules: []
-  readinessProbe:
-    enabled: true
-    failureThreshold: 3
-    initialDelaySeconds: 30
-    periodSeconds: 10
-    successThreshold: 1
-    timeoutSeconds: 1
-  replicaCount: 1
+  
   resources:
     limits:
       memory: 2048Mi
     requests:
       memory: 1024Mi
-  service:
-    annotations: null
-    clusterIP: ''
-    externalTrafficPolicy: Cluster
-    extraHeadlessPorts: []
-    extraPorts: []
-    headless:
-      annotations: null
-      extraPorts: []
-    http:
-      enabled: true
-    loadBalancerIP: ''
-    loadBalancerSourceRanges: []
-    nodePorts:
-      http: ''
-      https: ''
-    ports:
-      http: 80
-      https: 443
-    sessionAffinity: None
-    sessionAffinityConfig: null
-    type: ClusterIP
-  serviceAccount:
-    annotations: null
-    automountServiceAccountToken: true
-    create: true
-    extraLabels: null
-    name: ''
-  startupProbe:
-    enabled: false
-    failureThreshold: 60
+  
+  livenessProbe:
+    httpGet:
+      path: /health/live
+      port: 8080
+    initialDelaySeconds: 300
+    timeoutSeconds: 5
+  
+  readinessProbe:
+    httpGet:
+      path: /health/ready
+      port: 8080
     initialDelaySeconds: 30
-    periodSeconds: 5
-    successThreshold: 1
     timeoutSeconds: 1
-  tls:
+  
+  postgresql:
     enabled: false
+  
+  extraVolumes: |
+    - name: realm-ext-provider
+      emptyDir: {}
+  
+  extraVolumeMounts: |
+    - name: realm-ext-provider
+      mountPath: /opt/keycloak/providers
+  
+  extraInitContainers: |
+    - name: realm-ext-provider
+      image: busybox:1.36
+      imagePullPolicy: IfNotPresent
+      command:
+        - sh
+      args:
+        - -c
+        - |
+          echo "Skipping theme download for now"
+          touch /providers/keycloak-theme-dsfr.jar
+          touch /providers/keycloak-franceconnect.jar
+      volumeMounts:
+        - name: realm-ext-provider
+          mountPath: /providers
