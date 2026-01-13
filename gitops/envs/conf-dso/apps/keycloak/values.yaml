@@ -52,9 +52,9 @@ keycloak:
   replicaCount: 1
   
   image:
-    registry: docker.io
-    repository: bitnami/keycloak
-    tag: 22.0.5-debian-11-r0
+    registry: quay.io
+    repository: keycloak/keycloak
+    tag: "22.0.5"
     pullPolicy: IfNotPresent
   
   production: false
